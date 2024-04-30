@@ -18,6 +18,6 @@ async function postUsuario(req, res){
 
 }
 
-router.post("/", postUsuario)
+router.post("/newUser", postUsuario)
 
 module.exports = router;

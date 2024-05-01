@@ -1,4 +1,4 @@
-const { getUsuariosMongo, getUserMongo, createNuevoUsuarioMongo } = require("./UsuarioActions")
+const { getUsuariosMongo, getUserMongo, createNuevoUsuarioMongo, updateLibrosUsuarioMongo } = require("./UsuarioActions")
 const { generateToken } = require('../utils/auth');
 const CryptoJS = require("crypto-js")
 
@@ -21,6 +21,11 @@ async function createNuevoUsuario(datos) {
     const nuevoUsuarioCreado = await createNuevoUsuarioMongo(datos);
 
     return nuevoUsuarioCreado
+}
+
+async function updateLibrosUsuario(datos) {
+    const {username, libroId } = datos
+    return await updateLibrosUsuarioMongo(username, libroId)
 }
 
 
@@ -53,5 +58,6 @@ module.exports = {
     getUsuariosTodos,
     getUsuario,
     createNuevoUsuario,
+    updateLibrosUsuario,
     login,
 }

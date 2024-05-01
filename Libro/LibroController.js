@@ -1,5 +1,5 @@
 const {createNuevoLibroMongo} = require("./LibroActions")
-const {login} = require('../Usuario/UsuarioController')
+const {updateLibrosUsuario,login} = require('../Usuario/UsuarioController')
 
 async function createNuevoLibro(datos){
     try {
@@ -18,6 +18,7 @@ async function createNuevoLibro(datos){
         }
 
         const nuevoLibro = await createNuevoLibroMongo(datosLibro)
+        await updateLibrosUsuario({username: username, libroId: nuevoLibro._id})
         return nuevoLibro
 
     } catch(error){

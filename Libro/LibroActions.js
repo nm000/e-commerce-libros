@@ -1,7 +1,7 @@
-const Usuario = require("./LibroModel")
+const Libro = require("./LibroModel")
 
 async function createNuevoLibroMongo(datos){
-    const libroCreado = await Usuario.create(datos)
+    const libroCreado = await Libro.create(datos)
     return libroCreado
 }
 

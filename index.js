@@ -11,7 +11,9 @@ app.get("/", (req,res) => {
 })
 
 const rutasUsuario = require("./Usuario/UsuarioRoute")
+const rutasLibros = require("./Libro/LibroRoute")
 app.use('/Usuario', rutasUsuario);
+app.use('/Libro', rutasLibros)
 
 
 mongoose.connect('mongodb+srv://mendozanatalia0827:ujnObzsk6UmydYSG@cluster0.uidg9ve.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0').then(() => {

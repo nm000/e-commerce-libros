@@ -16,6 +16,11 @@ async function createNuevoUsuarioMongo(datos){
     return usuarioCreado
 }
 
+async function updateUsuarioMongo(username, datos){
+    const usuario = await Usuario.findOneAndUpdate({username},datos)
+    return usuario
+}
+
 async function updateLibrosUsuarioMongo(username, libroId){
     return await Usuario.findOneAndUpdate({username},{$push:{libro:libroId}},{new:true})
 }
@@ -24,5 +29,6 @@ module.exports = {
     getUsuariosMongo,
     getUserMongo,
     createNuevoUsuarioMongo,
+    updateUsuarioMongo,
     updateLibrosUsuarioMongo,
 }

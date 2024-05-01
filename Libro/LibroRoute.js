@@ -8,10 +8,11 @@ async function postLibro(req, res){
         res.status(200).json({
             mensaje: "Libro creado 😎"
         })
-    } catch(e){
-        res.status(500).json({
-            mensaje: "Falló en crearse el libro 😢",
-            error: e.message
+    } catch(error){
+        const err = JSON.parse(error.message);
+        res.status(err.code).json({
+            mensaje: "Falló al crearse el libro 📒",
+            err: err.msg,
         })
     }
 }

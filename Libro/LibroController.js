@@ -1,15 +1,15 @@
-const {createNuevoLibroMongo} = require("./LibroActions")
-const {updateLibrosUsuario,login} = require('../Usuario/UsuarioController')
+const { createNuevoLibroMongo } = require("./LibroActions")
+const { updateLibrosUsuario, login } = require('../Usuario/UsuarioController')
 
-async function createNuevoLibro(datos){
+async function createNuevoLibro(datos) {
     try {
         const { username, password, ...libro } = datos
 
-        const tokenJWT = await login({username,password})
+        const tokenJWT = await login({ username, password })
 
-        if(!tokenJWT){
-            throw new Error("Sin credenciales no hay libro 🙊")
-        }
+        /*if (!tokenJWT) {
+            throw new Error(JSON.stringify({ code: 501, msg: "Sin credenciales no hay libro 🙊" }))
+        }*/
 
         const datosLibro = {
             ...libro,
@@ -18,15 +18,12 @@ async function createNuevoLibro(datos){
         }
 
         const nuevoLibro = await createNuevoLibroMongo(datosLibro)
-        await updateLibrosUsuario({username: username, libroId: nuevoLibro._id})
+
+        await updateLibrosUsuario({ username: username, libroId: nuevoLibro._id })
         return nuevoLibro
-
-    } catch(error){
-        console.error("Error para crear su libro 📗", error)
-        throw new Error(error.message)
+    } catch (error) {
+        throw new Error(JSON.stringify({ code: 401, msg: "Error al crear su libro 📖" }))
     }
-      
-
 }
 
 module.exports = {

@@ -55,7 +55,7 @@ async function login(datos) {
     //console.log(hashPassword)
     const usuario = await getUserMongo({ username })
     if (!usuario.usuario || usuario.usuario.password !== hashPassword) {
-        throw new Error(JSON.stringify({ code: 401, msg: "Credenciales incorrectas" }))
+        throw new Error(JSON.stringify({ code: 401, msg: "Credenciales incorrectas 😑" }))
     }
 
     const token = generateToken({ id: usuario.usuario._id })

@@ -1,5 +1,16 @@
-const { createNuevoLibroMongo } = require("./LibroActions")
+const { createNuevoLibroMongo, getLibrosMongo, getLibrosFilterMongo} = require("./LibroActions")
 const { updateLibrosUsuario, login } = require('../Usuario/UsuarioController')
+
+async function getLibros() {
+    const libros = await getLibrosMongo()
+    return libros
+}
+
+async function getLibrosFilter(query) {
+    const {name, propietario, genero,  fechaPublicacion, casaEditorial,autor } = query 
+    const libros = await getLibrosFilterMongo(query)
+    return libros
+}
 
 async function createNuevoLibro(datos) {
     try {
@@ -28,4 +39,6 @@ async function createNuevoLibro(datos) {
 
 module.exports = {
     createNuevoLibro,
+    getLibros,
+    getLibrosFilter,
 }

@@ -2,7 +2,7 @@ const Usuario = require("./UsuarioModel")
 
 async function getUsuariosMongo(){
     const usuarios = await Usuario.find()
-    console.log(usuarios)
+    //console.log(usuarios)
     return {usuarios: usuarios}
 }
 

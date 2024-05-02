@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const {createNuevoLibro, getLibros, getLibrosFilter} = require("./LibroController");
+const {createNuevoLibro, getLibros, getLibrosFilter, updateLibro, deleteLibro} = require("./LibroController");
 
 async function getAllLibros(req, res){
     try{
@@ -42,7 +42,37 @@ async function postLibro(req, res){
         const err = JSON.parse(error.message);
         res.status(err.code).json({
             mensaje: "Falló al crearse el libro 📒",
-            err: err.msg,
+            err: err.msg
+        })
+    }
+}
+
+async function patchLibro(req, res){
+    try {
+        await updateLibro(req.body)
+        res.status(200).json({
+            mensaje: "Libro actualizado!"
+        })
+    }catch(error){
+        const err = JSON.parse(error.message)
+        res.status(err.code).json({
+            mensaje: "Falló al hacer actualizaciones",
+            err: err.msg
+        })
+    }
+}
+
+async function deleteBorrarLibro(req, res){
+    try{
+        await deleteLibro(req.body)
+        res.status(200).json({
+            mensaje: "Libro eliminado!"
+        })
+    }catch(error){
+        const err = JSON.parse(error.message)
+        res.status(err.code).json({
+            mensaje: "Falló al borrar el libro",
+            err: err.msg
         })
     }
 }
@@ -50,5 +80,6 @@ async function postLibro(req, res){
 router.get("/", getAllLibros)
 router.get("/filters", getLibrosFilters)
 router.post("/newLibro", postLibro)
-
+router.patch("/update", patchLibro)
+router.delete("/delete", deleteBorrarLibro)
 module.exports = router;

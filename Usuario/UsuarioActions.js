@@ -1,7 +1,7 @@
 const Usuario = require("./UsuarioModel")
 
 async function getUsuariosMongo(){
-    const usuarios = await Usuario.find()
+    const usuarios = await Usuario.find().select(["-password"])
     //console.log(usuarios)
     return {usuarios: usuarios}
 }

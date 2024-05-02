@@ -1,4 +1,4 @@
-const { createNuevoLibroMongo, getLibrosMongo, getLibrosFilterMongo} = require("./LibroActions")
+const { createNuevoLibroMongo, getLibrosMongo, getLibrosFilterMongo, updateLibroMongo, deleteLibroMongo} = require("./LibroActions")
 const { updateLibrosUsuario, login } = require('../Usuario/UsuarioController')
 
 async function getLibros() {
@@ -7,7 +7,7 @@ async function getLibros() {
 }
 
 async function getLibrosFilter(query) {
-    const {name, propietario, genero,  fechaPublicacion, casaEditorial,autor } = query 
+    const { name, propietario, genero,  fechaPublicacion, casaEditorial,autor } = query 
     const libros = await getLibrosFilterMongo(query)
     return libros
 }
@@ -37,8 +37,46 @@ async function createNuevoLibro(datos) {
     }
 }
 
+async function updateLibro(datos){
+    try {
+
+        const {username, password, _id, ...cambios} = datos
+
+        const tokenJWT = await login({ username, password })
+
+        const libros = await getLibrosFilter({propietario:username, _id})
+
+        if (!libros || !libros.libros){
+            throw new Error(JSON.stringify({code: 401, msg: "Usted no tiene un libro con esas características"}))
+        }
+
+        const respuesta = await updateLibroMongo(_id, cambios)
+        
+        return respuesta
+
+    }catch(error){
+        throw new Error(JSON.stringify({code: 401, msg: "Error al actualizar la información 😯"}))
+    }
+}
+
+async function deleteLibro(datos){
+    try {
+        const {username, password, _id} = datos
+
+        const tokenJWT = await login({ username, password })
+
+        return await deleteLibroMongo(_id)
+    } catch(error){
+        throw new Error(JSON.stringify({code: 401, msg: "Error al actualizar la información 😯"}))
+    }
+}
+
+
+
 module.exports = {
     createNuevoLibro,
     getLibros,
     getLibrosFilter,
+    updateLibro,
+    deleteLibro,
 }

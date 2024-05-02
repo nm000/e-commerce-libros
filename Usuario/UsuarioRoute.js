@@ -9,7 +9,6 @@ async function getUsuarios(req, res) {
             ...usuarios
         })
     } catch (e) {
-
         res.status(500).json({ msg: "Problemas para encontrar los usuarios 😶" })
     }
 }
@@ -21,7 +20,7 @@ async function getUsuarioFilter(req, res) {
             ...usuario
         })
     } catch (error) {
-        const err = JSON.parse(error.mensaje)
+        const err = JSON.parse(error.message)
         res.status(err.code).json({ mensaje: "Problemas para encontrar al usuario 😶" , err: err.msg})
     }
 }
@@ -36,7 +35,7 @@ async function postUsuario(req, res) {
         const err = JSON.parse(error.message);
         res.status(err.code).json({
             mensaje: "Falló al crear el usuario",
-            err: err.msg,
+            err: err.msg
         })
     }
 
@@ -48,10 +47,11 @@ async function patchUsuario(req, res) {
         res.status(200).json({
             mensaje: "Usuario actualizado 🙂"
         })
-    } catch (e) {
-        res.status(500).json({
+    } catch (error) {
+        const err = JSON.parse(error.message)
+        res.status(err.code).json({
             mensaje: "Falló al actualizarse la información 😞",
-            err: e.msg
+            err: err.msg
         })
     }
 }
@@ -66,7 +66,7 @@ async function postLogin(req, res) {
         const err = JSON.parse(error.message);
         res.status(err.code).json({
             mensaje: "Falló en iniciar sesión 😢",
-            err: err.msg,
+            err: err.msg
         })
     }
 }

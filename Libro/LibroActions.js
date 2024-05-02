@@ -15,8 +15,20 @@ async function createNuevoLibroMongo(datos){
     return libroCreado
 }
 
+async function updateLibroMongo(_id,cambios){
+    const respuesta = await Libro.findByIdAndUpdate(_id, cambios)
+    return respuesta
+}
+
+async function deleteLibroMongo(_id){
+    const respuesta = await Libro.findByIdAndUpdate(_id, {"isActive": false})
+    return respuesta
+}
+
 module.exports = {
     createNuevoLibroMongo,
     getLibrosMongo,
-    getLibrosFilterMongo
+    getLibrosFilterMongo,
+    updateLibroMongo,
+    deleteLibroMongo,
 }

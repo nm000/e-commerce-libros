@@ -7,13 +7,15 @@ app.use(cors())
 app.use(express.json())
 
 app.get("/", (req,res) => {
-    res.status(200).json({});
+    res.status(200).json({})
 })
 
 const rutasUsuario = require("./Usuario/UsuarioRoute")
 const rutasLibros = require("./Libro/LibroRoute")
-app.use('/Usuario', rutasUsuario);
+const rutasPedido = require("./Pedido/PedidoRoute")
+app.use('/Usuario', rutasUsuario)
 app.use('/Libro', rutasLibros)
+app.use('/Pedido', rutasPedido)
 
 
 mongoose.connect('mongodb+srv://mendozanatalia0827:ujnObzsk6UmydYSG@cluster0.uidg9ve.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0').then(() => {
@@ -24,6 +26,6 @@ mongoose.connect('mongodb+srv://mendozanatalia0827:ujnObzsk6UmydYSG@cluster0.uid
 }).catch((error) => {
     console.error("Error al conectar a la BD", error)
 })
-;
+
 
 //app.listen(8000);

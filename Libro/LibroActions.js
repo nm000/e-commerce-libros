@@ -2,12 +2,12 @@ const Libro = require("./LibroModel")
 
 async function getLibrosMongo(){
     const libros = await Libro.find()
-    return {libros: libros}
+    return libros
 }
 
 async function getLibrosFilterMongo(filtros){
-    const libros = await Libro.findOne(filtros)
-    return {libros: libros}
+    const libros = await Libro.find(filtros)
+    return libros
 }
 
 async function createNuevoLibroMongo(datos){

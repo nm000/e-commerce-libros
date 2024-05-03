@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const PedidoSchema = new mongoose.Schema({
-    usuario: {type: Number, required: true}, //number para el id del usuario que compra
-    usuarioVendedor: {type: Number, required: true},
+    usuario: {type: String, required: true}, //number para el id del usuario que compra
+    usuarioVendedor: {type: String, required: true},
     fechaCreacion: {type: Date, required: true},
     estado: {type: String, required: true},
     isCancelado: {type: Boolean, default: function() {
@@ -12,7 +12,7 @@ const PedidoSchema = new mongoose.Schema({
         return this.estado==='Completado' ? true : false
     }},
     libro: {type: [String], required: true},
-    direccionDestion: {type: String, required:true}
+    direccionDestino: {type: String, required:true}
 })
 
 

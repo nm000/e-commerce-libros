@@ -3,12 +3,17 @@ const { updateLibrosUsuario, login } = require('../Usuario/UsuarioController')
 
 async function getLibros() {
     const libros = await getLibrosMongo()
-    return libros
+    const librosActive = libros.filter((libro) => libro.isActive)
+    return librosActive
 }
 
 async function getLibrosFilter(query) {
-    const { name, propietario, genero,  fechaPublicacion, casaEditorial,autor } = query 
+    const { _id, name, propietario, genero,  fechaPublicacion, casaEditorial, autor, isDisponible, numeroUnidades, isActive } = query 
     const libros = await getLibrosFilterMongo(query)
+    if (!isActive){
+        const librosActive = libros.filter((l) => l.isActive)
+        return librosActive
+    }
     return libros
 }
 
@@ -44,9 +49,15 @@ async function updateLibro(datos){
 
         const tokenJWT = await login({ username, password })
 
-        const libros = await getLibrosFilter({propietario:username, _id})
+        var libros
 
-        if (!libros || !libros.libros){
+        if (!cambios.isActive){
+            libros = await getLibrosFilter({propietario:username, _id})
+        } else {
+            libros = await getLibrosFilter({propietario:username, _id, isActive:true}) //PROBAR ESTO CON MÁS LIBROS
+        }
+
+        if (!libros){
             throw new Error(JSON.stringify({code: 401, msg: "Usted no tiene un libro con esas características"}))
         }
 

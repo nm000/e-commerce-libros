@@ -78,8 +78,8 @@ async function deleteBorrarLibro(req, res){
 }
 
 router.get("/", getAllLibros)
-router.get("/filters", getLibrosFilters)
-router.post("/newLibro", postLibro)
-router.patch("/update", patchLibro)
-router.delete("/delete", deleteBorrarLibro)
+router.get("/filtros", getLibrosFilters)
+router.post("/nuevoLibro", postLibro)
+router.patch("/actualizarLibro", patchLibro)
+router.delete("/borrarLibro", deleteBorrarLibro)
 module.exports = router;

@@ -16,6 +16,10 @@ async function createNewPedido(datos) {
         const libroObject = await getLibrosFilter({ _id: _id1 })
         const propietario = libroObject[0].propietario
 
+        if (propietario === username) {
+            throw new Error(JSON.stringify({ code: 401, msg: "No puede comprarse sus propios libros. "}))
+        }
+
         const librosPropietario = await getLibrosFilter({ propietario })
         const librosPropietarioIds = librosPropietario.map((libro) => libro._id.toString()) // Obtiene solo los IDs de los libros del propietario
         for (const libroId of pedido.libro) {

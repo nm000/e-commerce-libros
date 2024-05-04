@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
-const secretKey = 'thisIsASecretKEY'; 
+secretKey = "secretOrPrivateKey must have a value"
+
 
 function generateToken(user) {
-    return jwt.sign({ userId: user.id }, secretKey, { expiresIn: '1h' });
+    id = user[0]._id.toString()
+    return jwt.sign({ id: id, username: user[0].username }, secretKey);
 }
 
 function verifyToken(token) {

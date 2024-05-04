@@ -17,5 +17,5 @@ async function postPedido(req, res){
     }
 }
 
-router.post("/newPedido", postPedido)
+router.post("/nuevoPedido", postPedido)
 module.exports = router;

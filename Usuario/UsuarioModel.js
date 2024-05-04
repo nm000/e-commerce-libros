@@ -6,6 +6,7 @@ const UsuarioSchema = new mongoose.Schema({
     alias: {type: String, required: true},
     direccion: {type: [String]}, //simular referenciado
     libro: {type: [String]},
+    isActive: {type: Boolean, default: true}
 }, {
     timestamps: true
 })

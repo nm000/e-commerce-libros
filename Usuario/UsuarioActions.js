@@ -1,14 +1,14 @@
 const Usuario = require("./UsuarioModel")
 
 async function getUsuariosMongo(){
-    const usuarios = await Usuario.find().select(["-password"])
+    const usuarios = await Usuario.find()
     //console.log(usuarios)
-    return {usuarios: usuarios}
+    return usuarios
 }
 
 async function getUserMongo(filters){
-    const usuario = await Usuario.findOne(filters)
-    return {usuario: usuario}
+    const usuario = await Usuario.find(filters)
+    return usuario
 }
 
 async function createNuevoUsuarioMongo(datos){
@@ -25,10 +25,15 @@ async function updateLibrosUsuarioMongo(username, libroId){
     return await Usuario.findOneAndUpdate({username},{$push:{libro:libroId}},{new:true})
 }
 
+async function deleteUsuarioMongo(_id){
+    return await Usuario.findOneAndUpdate({_id}, {isActive: false})
+}
+
 module.exports = {
     getUsuariosMongo,
     getUserMongo,
     createNuevoUsuarioMongo,
     updateUsuarioMongo,
     updateLibrosUsuarioMongo,
+    deleteUsuarioMongo,
 }

@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
 const app = express()
+require('dotenv').config()
 
 app.use(cors())
 app.use(express.json())
@@ -18,7 +19,7 @@ app.use('/Libro', rutasLibros)
 app.use('/Pedido', rutasPedido)
 
 
-mongoose.connect('mongodb+srv://mendozanatalia0827:ujnObzsk6UmydYSG@cluster0.uidg9ve.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0').then(() => {
+mongoose.connect(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.uidg9ve.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`).then(() => {
     console.log("La conexión a DB se ha establecido")
     app.listen(8001, () => {
         console.log("Servidor escuchando en el puerto 8001")

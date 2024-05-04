@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router();
-const { getUsuariosTodos, getUsuario, createNuevoUsuario, updateUsuario, login } = require("./UsuarioController");
+const { getUsuariosTodos, getUsuario, createNuevoUsuario, updateUsuario, login, verificarToken } = require("./UsuarioController");
 
 async function getUsuarios(req, res) {
     try {
@@ -43,7 +43,7 @@ async function postUsuario(req, res) {
 
 async function patchUsuario(req, res) {
     try {
-        await updateUsuario(req.body)
+        await updateUsuario(req.headers['authorization'],req.body)
         res.status(200).json({
             mensaje: "Usuario actualizado 🙂"
         })
@@ -72,9 +72,9 @@ async function postLogin(req, res) {
 }
 
 router.get("/", getUsuarios)
-router.get("/getFilters", getUsuarioFilter)
+router.get("/filtros", getUsuarioFilter)
 router.post("/login", postLogin)
-router.post("/create", postUsuario)
-router.patch("/update", patchUsuario)
+router.post("/nuevoUsuario", postUsuario)
+router.patch("/actualizarUsuario", patchUsuario)
 
 module.exports = router;

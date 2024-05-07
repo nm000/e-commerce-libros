@@ -11,7 +11,7 @@ function verifyToken(token) {
     if (token && token.startsWith('Bearer ')){
         const tokenJWT = token.slice(7)
         try {
-            jwt.verify(tokenJWT, secretKey)
+            return jwt.verify(tokenJWT, secretKey)
         } catch (error){
             throw new Error (JSON.stringify({code: 401, msg: 'Token inválido' }))
         }

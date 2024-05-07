@@ -9,8 +9,8 @@ const schemaLibro = new mongoose.Schema({
     author: {type: String, required: true},
     price: {type: Number, requited: true},
     numberOfUnits: {type: Number, required: true},
-    isAvailable: {type: Boolean, required: true},
-    isActive: {type: Boolean, required: true}
+    isAvailable: {type: Boolean, default: true},
+    isActive: {type: Boolean, default: true}
 },{
     timestamps: true,
     versionKey: false

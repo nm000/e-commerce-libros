@@ -25,9 +25,10 @@ async function getBook(query) {
 async function createBook(token, data) {
 
     const decodedToken = verifyToken(token)
+    console.log(decodedToken)
 
     if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay pedido 🙊" }))
+        throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay libro 🙊" }))
     }
 
     const { ...book } = data
@@ -40,9 +41,10 @@ async function createBook(token, data) {
 
     try {
         const newBook = await createBookMongo(bookInfo)
-        await updateBooksUserMongo({ username: decodedToken.username, bookId: newBook._id }) // CHECK: if it is newBook[0]._id or is in this way
+        const response = await updateBooksUserMongo(decodedToken.username, newBook._id.toString())
         return newBook
     } catch (error) {
+        console.log(error)
         throw new Error(JSON.stringify({ code: 400, msg: "Error al crear su libro 📖" }))
     }
 
@@ -54,7 +56,7 @@ async function updateBook(token, data) {
     const decodedToken = verifyToken(token)
 
     if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay pedido 🙊" }))
+        throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay libro 🙊" }))
     }
 
     const { _id, ...changes } = data
@@ -87,18 +89,18 @@ async function deleteBook(token, id) {
     if (!decodedToken) {
         throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay pedido 🙊" }))
     }
-
-    try {
-        const book = await getBookMongo({ _id: id })
-        if (book[0].owner === decodedToken.username) {
+    const book = await getBookMongo({ _id: id })
+    console.log(book)
+    if (book[0].owner === decodedToken.username) {
+        try {
             return await deleteBookMongo(id)
-        } else {
-            throw new Error(JSON.stringify({ code: 400, msg: "No puedes borrar un libro que no te pertenece." }))
+        } catch (error) {
+            throw new Error(JSON.stringify({ code: 401, msg: "Error al borrar el libro 😯" }))
         }
-
-    } catch (error) {
-        throw new Error(JSON.stringify({ code: 401, msg: "Error al actualizar la información 😯" }))
+    } else {
+        throw new Error(JSON.stringify({ code: 400, msg: "No puedes borrar un libro que no te pertenece." }))
     }
+
 }
 
 

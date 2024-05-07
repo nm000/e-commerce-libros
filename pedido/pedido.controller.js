@@ -50,15 +50,9 @@ async function createOrder(token, data) {
     }
 
     const response = await createOrderMongo(newOrder)
+
     return response
 }
-    /*if (libros.length>1){
-        const librosAutor = libros.filter((l)=>l.propietario !== propietario)
-        if (librosAutot.length>0){
-            throw new Error(JSON.stringify({ code: 401, msg: "Los libros no pertenecen al mismo vendedor. "}))
-        }
-    }*/
-
 
 module.exports = {
     createOrder,

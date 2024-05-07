@@ -6,7 +6,7 @@ const schemaUsuario = new mongoose.Schema({
     fullName: {type: String, required: true},
     phoneNumber: {type: String, required: true},
     alias: {type: String, required: true},
-    libro: {type: [String]},
+    book: {type: [String]},
     isActive: {type: Boolean, default: true}
 }, {
     versionKey: false,

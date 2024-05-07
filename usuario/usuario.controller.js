@@ -70,7 +70,7 @@ async function login(datos) {
     const hashPassword = CryptoJS.MD5(password).toString()
     //console.log(hashPassword)
     const usuario = await getUser({ username })
-    if (!usuario || usuario[0].password !== hashPassword) {
+    if (!usuario[0] || usuario[0].password !== hashPassword) {
         throw new Error(JSON.stringify({ code: 401, msg: "Credenciales incorrectas 😑" }))
     }
 

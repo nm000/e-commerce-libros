@@ -8,10 +8,15 @@ function generateToken(user) {
 }
 
 function verifyToken(token) {
-    try {
-        return jwt.verify(token, secretKey);
-    } catch (error) {
-        return null;
+    if (token && token.startsWith('Bearer ')){
+        const tokenJWT = token.slice(7)
+        try {
+            jwt.verify(tokenJWT, secretKey)
+        } catch (error){
+            throw new Error (JSON.stringify({code: 401, msg: 'Token inválido' }))
+        }
+    } else {
+        throw new Error (JSON.stringify({code: 401, msg: 'Token no proporcionado' }))
     }
 }
 

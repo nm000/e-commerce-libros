@@ -1,10 +1,16 @@
 const express = require('express')
 const router = express.Router();
-const { getUsuariosTodos, getUsuario, createNuevoUsuario, updateUsuario, login, verificarToken } = require("./UsuarioController");
+const { getUsers,
+    getUser,
+    createUser,
+    updateUser,
+    login,
+    deleteUser,
+    verifyTokenLogin } = require("./usuario.controller");
 
-async function getUsuarios(req, res) {
+async function getForUsers(req, res) {
     try {
-        const usuarios = await getUsuariosTodos()
+        const usuarios = await getUsers()
         res.status(200).json({
             ...usuarios
         })
@@ -13,9 +19,9 @@ async function getUsuarios(req, res) {
     }
 }
 
-async function getUsuarioFilter(req, res) {
+async function getForUser(req, res) {
     try {
-        const usuario = await getUsuario(req.query)
+        const usuario = await getUser(req.query)
         res.status(200).json({
             ...usuario
         })
@@ -25,9 +31,9 @@ async function getUsuarioFilter(req, res) {
     }
 }
 
-async function postUsuario(req, res) {
+async function postUser(req, res) {
     try {
-        await createNuevoUsuario(req.body)
+        await createUser(req.body)
         res.status(200).json({
             mensaje: "Nuevo usuario 😎"
         })
@@ -41,9 +47,9 @@ async function postUsuario(req, res) {
 
 }
 
-async function patchUsuario(req, res) {
+async function patchUser(req, res) {
     try {
-        await updateUsuario(req.headers['authorization'],req.body)
+        await updateUser(req.headers['authorization'],req.body)
         res.status(200).json({
             mensaje: "Usuario actualizado 🙂"
         })
@@ -71,10 +77,10 @@ async function postLogin(req, res) {
     }
 }
 
-router.get("/", getUsuarios)
-router.get("/filtros", getUsuarioFilter)
+router.get("/", getForUsers)
+router.get("/filtros", getForUser)
 router.post("/login", postLogin)
-router.post("/nuevoUsuario", postUsuario)
-router.patch("/actualizarUsuario", patchUsuario)
+router.post("/nuevoUsuario", postUser)
+router.patch("/actualizarUsuario", patchUser)
 
 module.exports = router;

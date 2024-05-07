@@ -11,9 +11,9 @@ app.get("/", (req,res) => {
     res.status(200).json({})
 })
 
-const rutasUsuario = require("./Usuario/UsuarioRoute")
-const rutasLibros = require("./Libro/LibroRoute")
-const rutasPedido = require("./Pedido/PedidoRoute")
+const rutasUsuario = require("./usuario/usuario.route")
+const rutasLibros = require("./libro/libro.route")
+const rutasPedido = require("./pedido/pedido.route")
 app.use('/Usuario', rutasUsuario)
 app.use('/Libro', rutasLibros)
 app.use('/Pedido', rutasPedido)

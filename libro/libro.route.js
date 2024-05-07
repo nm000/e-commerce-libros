@@ -1,12 +1,16 @@
 const express = require('express')
-const router = express.Router();
-const {createNuevoLibro, getLibros, getLibrosFilter, updateLibro, deleteLibro} = require("./LibroController");
+const router = express.Router()
+const { createBook,
+    getBooks,
+    getBook,
+    updateBook,
+    deleteBook,} = require("./libro.controller")
 
-async function getAllLibros(req, res){
+async function getForBooks(req, res){
     try{
-        const libros = await getLibros()
+        const books = await getBooks()
         res.status(200).json({
-            ...libros
+            ...books
         })
     } catch(error){
         const err = JSON.parse(error.message)
@@ -17,11 +21,11 @@ async function getAllLibros(req, res){
     }
 }
 
-async function getLibrosFilters(req, res){
+async function getForBook(req, res){
     try {
-        const libros = await getLibrosFilter(req.query)
+        const books = await getBook(req.query)
         res.status(200).json({
-            ...libros
+            ...books
         })
     }catch(error){
         const err = JSON.parse(error.message)
@@ -32,9 +36,9 @@ async function getLibrosFilters(req, res){
     }
 }
 
-async function postLibro(req, res){
+async function postBook(req, res){
     try{
-        await createNuevoLibro(req.body)
+        await createBook(req.headers['authorization'],req.body)
         res.status(200).json({
             mensaje: "Libro creado 😎"
         })
@@ -47,9 +51,9 @@ async function postLibro(req, res){
     }
 }
 
-async function patchLibro(req, res){
+async function patchBook(req, res){
     try {
-        await updateLibro(req.body)
+        await updateBook(req.headers['authorization'],req.body)
         res.status(200).json({
             mensaje: "Libro actualizado!"
         })
@@ -62,9 +66,9 @@ async function patchLibro(req, res){
     }
 }
 
-async function deleteBorrarLibro(req, res){
+async function deleteForBook(req, res){
     try{
-        await deleteLibro(req.body)
+        await deleteBook(req.headers['authorization'],req.body)
         res.status(200).json({
             mensaje: "Libro eliminado!"
         })
@@ -77,9 +81,9 @@ async function deleteBorrarLibro(req, res){
     }
 }
 
-router.get("/", getAllLibros)
-router.get("/filtros", getLibrosFilters)
-router.post("/nuevoLibro", postLibro)
-router.patch("/actualizarLibro", patchLibro)
-router.delete("/borrarLibro", deleteBorrarLibro)
+router.get("/", getForBooks)
+router.get("/filtros", getForBook)
+router.post("/nuevoLibro", postBook)
+router.patch("/actualizarLibro", patchBook)
+router.delete("/borrarLibro", deleteForBook)
 module.exports = router;

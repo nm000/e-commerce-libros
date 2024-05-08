@@ -57,17 +57,15 @@ async function updateBook(token, data) {
     var books
     try {
 
-        if (!changes.isActive) {
-            books = await getBookMongo({ owner: decodedToken.username, _id })
-        } else {
-            books = await getBookMongo({ owner: decodedToken.username, _id, isActive: true }) //PROBAR ESTO CON MÁS LIBROS
-        }
+        books = await getBooksMongo({ owner: decodedToken.username, _id: _id })
+        console.log(books)
 
-        if (!books) {
+        if (books.length===0) {
             throw new Error(JSON.stringify({ code: 401, msg: "Usted no tiene un libro con esas características" }))
         }
 
-        const response = await updateBookMongo(_id, changes)
+        
+        const response = await updateBookMongo({_id: _id}, changes)
 
         return response
 
@@ -82,7 +80,7 @@ async function deleteBook(token, id) {
     if (!decodedToken) {
         throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay pedido 🙊" }))
     }
-    const book = await getBookMongo({ _id: id })
+    const book = await getBooksMongo({ _id: id })
     console.log(book)
     if (book[0].owner === decodedToken.username) {
         try {

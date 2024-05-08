@@ -2,7 +2,7 @@ const { createOrderMongo,
     getOrdersMongo,
     updateOrderMongo
 } = require("./pedido.actions")
-const { getBooksMongo } = require("../libro/libro.actions")
+const { getBooksMongo, updateBookMongo } = require("../libro/libro.actions")
 const { generateToken, verifyToken } = require('../utils/auth');
 const { getUsersMongo } = require("../usuario/usuario.actions");
 const { query } = require("express");
@@ -81,39 +81,88 @@ async function getTotalPayment(books) {
     }
 }
 
+function getCountOfBooks(books){
+    let booksUnitsRequired = {}
+
+    books.forEach(book => {
+        if (!booksUnitsRequired[book]) {
+            booksUnitsRequired[book] = 1
+        } else {
+            booksUnitsRequired[book]++
+        }
+    })
+
+    console.log(booksUnitsRequired)
+
+    return booksUnitsRequired
+}
+
+function validateBookIsAvailable(book, units){
+    if (book.isActive && (book.numberOfUnits >= units)){
+        return true
+    }
+    return false
+}
+
+async function updateUnitsBooks(book, units){
+    const u = book.numberOfUnits-units
+    if (u===0){
+        await updateBookMongo({_id: book._id}, {numberOfUnits: 0, isAvailable: false, isActive: false})
+    } else {
+        await updateBookMongo({_id: book._id}, {numberOfUnits: u})
+    }
+}
+
 async function createOrder(token, data) {
 
-    const decodedToken = verifyToken(token)
+    const decodedToken = verifyToken(token) // verify the auth header
 
-    if (!decodedToken) {
+    if (!decodedToken) { // person did not attach the auth
         throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay pedido 🙊" }))
     }
 
-    var owner, book, totalPayment
+    var owner, book, totalPayment 
+    var booksQuantity = getCountOfBooks(data.book)
 
     if (typeof data.book === "string" || data.book.length === 1) { // It means that user just request one book
         const _id = data.book
-        book = await getBooksMongo({ _id })
+        book = await getBooksMongo({ _id: _id })
+        if (!validateBookIsAvailable(book[0], 1)){
+            throw new Error(JSON.stringify({ code: 400, msg: "El libro no está disponible para la compra"}))
+        }
+
         totalPayment = book[0].price
-        owner = book[0].owner
+        owner = book[0].owner    
         //console.log(book[0])
     } else {
-        const _id1 = data.book[0]
-        book = await getBooksMongo({ _id: _id1 })
-        owner = book[0].owner
-
-        if (owner === decodedToken.username) {
-            throw new Error(JSON.stringify({ code: 401, msg: "No puede comprarse sus propios libros. " }))
+        let booksData = []
+        for (const b of data.book) {
+            const book = await getBooksMongo({ _id: b })
+            booksData.push(book)
         }
+        //console.log(booksData)
+        const ownerBooks = await getBooksMongo({ owner: booksData[0][0].owner })
+        const ownerBooksId = ownerBooks.map(b => b._id.toString())
 
-        ownerBooks = await getBooksMongo({ owner })
-        const ownerBooksId = ownerBooks.map((b) => b._id.toString()) // Obtiene solo los IDs de los libros del propietario
-        for (const id of data.book) {
-            if (!ownerBooksId.includes(id)) {
-                throw new Error(JSON.stringify({ code: 401, msg: "Los libros no pertenecen al mismo autor." }))
+        for (const book of booksData) {
+
+            if (book[0].owner === decodedToken.username) {
+                throw new Error(JSON.stringify({ code: 401, msg: "No puedes comprar tus propios libros." }));
+            }
+
+            if (!ownerBooksId.includes(book[0]._id.toString())) {
+                throw new Error(JSON.stringify({ code: 401, msg: "Los libros no pertenecen al mismo autor." }));
+            }
+
+            //console.log(book[0], booksQuantity[book[0]._id.toString()])
+            if (!validateBookIsAvailable(book[0], booksQuantity[book[0]._id.toString()])) {
+                throw new Error(JSON.stringify({ code: 400, msg: "El libro no está disponible para la compra"}));
             }
         }
+
+        owner = booksData[0][0].owner
         totalPayment = await getTotalPayment(data.book)
+    
     }
 
     const newOrder = {
@@ -125,9 +174,21 @@ async function createOrder(token, data) {
         "total": totalPayment
     }
 
-    const response = await createOrderMongo(newOrder)
+    try{
+        const response = await createOrderMongo(newOrder)
+        console.log(response)
+        for (let b of Object.entries(booksQuantity)) {
+            console.log(b[0])
+            const book = await getBooksMongo({_id: b[0]})
+            updateUnitsBooks(book[0], b[1])
+        }
 
-    return response
+        return response
+    } catch(error){
+        throw new Error(JSON.stringify({ code: 400, msg: "Error al crear su pedido, intente más tarde!", err: error }))
+    }
+
+    
 }
 
 

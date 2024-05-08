@@ -1,33 +1,27 @@
 const { getUsersMongo,
-    getUserMongo,
     createUserMongo,
     updateUserMongo,
     updateBooksUserMongo,
     deleteUserMongo,
- } =  require("./usuario.actions")
+} = require("./usuario.actions")
 const { generateToken, verifyToken } = require('../utils/auth');
 const CryptoJS = require("crypto-js")
 
-async function getUsers() {
-    const users = await getUsersMongo();
-    const activeUsers = users.filter((u) => u.isActive)
-    return activeUsers
-}
+async function getUsers(query) {
 
-async function getUser(query) {
-    const { username, fullName, phoneNumber, alias, isActive } = query
-    const users = await getUserMongo(query)
-    if (!isActive){
+    const users = await getUsersMongo(query)
+    if (!query.isActive) {
         const activeUsers = users.filter((u) => u.isActive)
         return activeUsers
     }
     return users
 }
 
+
 async function createUser(data) {
     const { username, password, fullName, phoneNumber, alias } = data
 
-    if ((await getUser({ username })).length === 0){
+    if ((await getUser({ username })).length === 0) {
         data.password = CryptoJS.MD5(data.password).toString()
 
         const user = await createUserMongo(data);
@@ -50,12 +44,12 @@ async function updateUser(token, data) {
 
 }
 
-async function deleteUser(token, data){
-    
+async function deleteUser(token, data) {
+
     const decodedToken = verifyToken(token)
 
-    if(!decodedToken){
-        throw new Error(JSON.stringify({ code: 400, msg: "Sin credeciales no se borra "}))
+    if (!decodedToken) {
+        throw new Error(JSON.stringify({ code: 400, msg: "Sin credeciales no se borra " }))
     }
 
     const user = await deleteUserMongo(decodedToken.id)
@@ -74,7 +68,7 @@ async function login(datos) {
         throw new Error(JSON.stringify({ code: 401, msg: "Credenciales incorrectas 😑" }))
     }
 
-    const token = generateToken( usuario )
+    const token = generateToken(usuario)
     console.log(token)
 
     return token
@@ -85,7 +79,6 @@ async function login(datos) {
 
 module.exports = {
     getUsers,
-    getUser,
     createUser,
     updateUser,
     login,

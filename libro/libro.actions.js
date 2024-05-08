@@ -1,11 +1,6 @@
 const Libro = require("./libro.model")
 
-async function getBooksMongo(){
-    const books = await Libro.find()
-    return books
-}
-
-async function getBookMongo(filters){
+async function getBooksMongo(filters){
     const books = await Libro.find(filters)
     return books
 }
@@ -28,7 +23,6 @@ async function deleteBookMongo(_id){
 module.exports = {
     createBookMongo,
     getBooksMongo,
-    getBookMongo,
     updateBookMongo,
     deleteBookMongo,
 }

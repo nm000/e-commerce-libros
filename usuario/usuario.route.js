@@ -10,7 +10,7 @@ const { getUsers,
 
 async function getForUsers(req, res) {
     try {
-        const usuarios = await getUsers()
+        const usuarios = await getUsers(req.query)
         res.status(200).json({
             ...usuarios
         })
@@ -19,17 +19,6 @@ async function getForUsers(req, res) {
     }
 }
 
-async function getForUser(req, res) {
-    try {
-        const usuario = await getUser(req.query)
-        res.status(200).json({
-            ...usuario
-        })
-    } catch (error) {
-        const err = JSON.parse(error.message)
-        res.status(err.code).json({ mensaje: "Problemas para encontrar al usuario 😶" , err: err.msg})
-    }
-}
 
 async function postUser(req, res) {
     try {
@@ -78,7 +67,6 @@ async function postLogin(req, res) {
 }
 
 router.get("/", getForUsers)
-router.get("/filtros", getForUser)
 router.post("/login", postLogin)
 router.post("/nuevoUsuario", postUser)
 router.patch("/actualizarUsuario", patchUser)

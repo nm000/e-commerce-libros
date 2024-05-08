@@ -1,12 +1,7 @@
 const Usuario = require("./usuario.model")
 
-async function getUsersMongo(){
-    const usuarios = await Usuario.find()
-    //console.log(usuarios)
-    return usuarios
-}
 
-async function getUserMongo(filters){
+async function getUsersMongo(filters){
     const usuario = await Usuario.find(filters)
     return usuario
 }
@@ -31,7 +26,6 @@ async function deleteUserMongo(_id){
 
 module.exports = {
     getUsersMongo,
-    getUserMongo,
     createUserMongo,
     updateUserMongo,
     updateBooksUserMongo,

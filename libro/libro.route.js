@@ -2,32 +2,16 @@ const express = require('express')
 const router = express.Router()
 const { createBook,
     getBooks,
-    getBook,
     updateBook,
     deleteBook,} = require("./libro.controller")
 
 async function getForBooks(req, res){
     try{
-        const books = await getBooks()
+        const books = await getBooks(req.query)
         res.status(200).json({
             ...books
         })
     } catch(error){
-        const err = JSON.parse(error.message)
-        res.status(err.code).json({
-            mensaje: "Falló al obtener libros 📚",
-            err: err.msg
-        })
-    }
-}
-
-async function getForBook(req, res){
-    try {
-        const books = await getBook(req.query)
-        res.status(200).json({
-            ...books
-        })
-    }catch(error){
         const err = JSON.parse(error.message)
         res.status(err.code).json({
             mensaje: "Falló al obtener libros 📚",
@@ -82,7 +66,6 @@ async function deleteForBook(req, res){
 }
 
 router.get("/", getForBooks)
-router.get("/filtros", getForBook)
 router.post("/nuevoLibro", postBook)
 router.patch("/actualizarLibro", patchBook)
 router.delete("/borrarLibro", deleteForBook)

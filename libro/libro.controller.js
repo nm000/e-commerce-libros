@@ -1,26 +1,19 @@
 const { createBookMongo,
     getBooksMongo,
-    getBookMongo,
     updateBookMongo,
     deleteBookMongo, } = require("./libro.actions")
 const { updateBooksUserMongo } = require('../usuario/usuario.actions')
 const { verifyToken } = require("../utils/auth")
 
-async function getBooks() {
-    const books = await getBooksMongo()
-    const activeBooks = books.filter((b) => b.isActive)
-    return activeBooks
-}
-
-async function getBook(query) {
-    const { isActive, ...info } = query
-    const books = await getBookMongo(query)
-    if (!isActive) {
+async function getBooks(query) {
+    const books = await getBooksMongo(query)
+    if (!query.isActive) {
         const activeBooks = books.filter((b) => b.isActive)
         return activeBooks
     }
     return books
 }
+
 
 async function createBook(token, data) {
 
@@ -108,7 +101,6 @@ async function deleteBook(token, id) {
 module.exports = {
     createBook,
     getBooks,
-    getBook,
     updateBook,
     deleteBook,
 }

@@ -8,12 +8,9 @@ const schemaPedido = new mongoose.Schema({
     book: {type: [String], required: true},
     dropOffAddress: {type: String, required:true},
     total: {type: Number, required:true},
-    isCancelled: {type: Boolean, default: function() {
-        return this.estado==='Cancelado' ? true : false
-    }},
-    isCompleted: {type: Boolean, default: function(){
-        return this.estado==='Completado' ? true : false
-    }},
+    isCancelled: {type: Boolean, default: false},
+    isCompleted: {type: Boolean, default: false},
+    createdDate: {type: String}
 }, {
     versionKey: false,
     timestamps: true

@@ -1,6 +1,9 @@
 const express = require('express')
 const router = express.Router();
-const {createOrder} = require('./pedido.controller')
+const {createOrder,
+    getOrders,
+    updateOrder,
+} = require('./pedido.controller')
 
 async function postOrder(req, res){
     try {
@@ -17,5 +20,37 @@ async function postOrder(req, res){
     }
 }
 
+async function getForOrders(req, res){
+    try{
+        const orders = await getOrders(req.headers['authorization'], req.query)
+        res.status(200).json({
+            ...orders
+        })
+    } catch(error){
+        const err = JSON.parse(error.message)
+        res.status(err.code).json({
+            mensaje: "Problemas al obtener sus pedidos 😐",
+            err: err.msg
+        })
+    }
+}
+
+async function patchOrder(req, res){
+    try{
+        const response = await updateOrder(req.headers['authorization'], req.body)
+        res.status(200).json({
+            mensaje: "Estado de pedido actualizado !!"
+        })
+    } catch(error){
+        const err = JSON.parse(error.message)
+        res.status(err.code).json({
+            mensaje: "Problemas al actualizar su pedidos 😐",
+            err: err.msg
+        })
+    }
+}
+
+router.get("/", getForOrders)
 router.post("/nuevoPedido", postOrder)
+router.patch("/", patchOrder)
 module.exports = router;

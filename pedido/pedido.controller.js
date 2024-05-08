@@ -3,9 +3,9 @@ const { createOrderMongo,
     updateOrderMongo
 } = require("./pedido.actions")
 const { getBooksMongo, updateBookMongo } = require("../libro/libro.actions")
-const { generateToken, verifyToken } = require('../utils/auth');
+const { verifyToken } = require('../utils/auth');
 const { getUsersMongo } = require("../usuario/usuario.actions");
-const { query } = require("express");
+
 
 async function getOrders(token, query) {
 
@@ -36,6 +36,17 @@ async function getOrders(token, query) {
     return orders
 }
 
+
+async function updateStatusBooks(orderId){
+    const order = await getOrdersMongo({_id:orderId})
+    const books = order[0].book
+    console.log(books)
+    for (let book in books) {
+        console.log(books[book])
+        await updateBookMongo({_id:books[book]}, {isActive: false, isDisponible: false, numberOfUnits: 0})
+    }
+}
+
 async function updateOrder(token, data){
     
     const decodedToken = verifyToken(token)
@@ -47,16 +58,21 @@ async function updateOrder(token, data){
     const order = await getOrdersMongo({ _id: data._id })
 
     if (decodedToken.username === order[0].buyer) {
-        if (!data.status || data.status !== "Completado") {
-            throw new Error(JSON.stringify({ code: 401, msg: "Usted no puede cambiar la información de este pedido"}))
-        } else {
-            return await updateOrderMongo({_id: data._id}, {status: "Completado", isCompleted: true})
-        }
-    } else if (decodedToken.username === order[0].seller){
         if (!data.status || data.status !== "Cancelado") {
             throw new Error(JSON.stringify({ code: 401, msg: "Usted no puede cambiar la información de este pedido"}))
         } else {
-            return await updateOrderMongo({_id: data._id}, {status: "Cancelado", isCancelled: true})
+            const response = await updateOrderMongo({_id: data._id}, {status: "Cancelado", isCancelled: true})
+            return response
+        }
+    } else if (decodedToken.username === order[0].seller){
+        if (!data.status || (data.status !== "Cancelado" && data.status!=="Completado")) {
+            throw new Error(JSON.stringify({ code: 401, msg: "Usted no puede cambiar la información de este pedido"}))
+        } else if (data.status === "Cancelado") {
+            return await updateOrderMongo({_id: data._id}, {status: data.status, isCancelled: true})
+        } else {
+            const response =  await updateOrderMongo({_id: data._id}, {status: data.status, isCompleted: true})
+            await updateStatusBooks(data._id)
+            return response
         }
     } else {
         throw new Error(JSON.stringify({ code: 401, msg: "Usted no tiene ese pedido en su lista, rectifique!!"}))
@@ -104,14 +120,6 @@ function validateBookIsAvailable(book, units){
     return false
 }
 
-async function updateUnitsBooks(book, units){
-    const u = book.numberOfUnits-units
-    if (u===0){
-        await updateBookMongo({_id: book._id}, {numberOfUnits: 0, isAvailable: false, isActive: false})
-    } else {
-        await updateBookMongo({_id: book._id}, {numberOfUnits: u})
-    }
-}
 
 async function createOrder(token, data) {
 
@@ -156,7 +164,7 @@ async function createOrder(token, data) {
 
             //console.log(book[0], booksQuantity[book[0]._id.toString()])
             if (!validateBookIsAvailable(book[0], booksQuantity[book[0]._id.toString()])) {
-                throw new Error(JSON.stringify({ code: 400, msg: "El libro no está disponible para la compra"}));
+                throw new Error(JSON.stringify({ code: 400, msg: "El libro no está disponible para la compra o está solicitando más unidades de las disponibles"}));
             }
         }
 
@@ -176,13 +184,6 @@ async function createOrder(token, data) {
 
     try{
         const response = await createOrderMongo(newOrder)
-        console.log(response)
-        for (let b of Object.entries(booksQuantity)) {
-            console.log(b[0])
-            const book = await getBooksMongo({_id: b[0]})
-            updateUnitsBooks(book[0], b[1])
-        }
-
         return response
     } catch(error){
         throw new Error(JSON.stringify({ code: 400, msg: "Error al crear su pedido, intente más tarde!", err: error }))

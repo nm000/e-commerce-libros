@@ -8,7 +8,7 @@ const schemaLibro = new mongoose.Schema({
     publishingHouse: {type: String, required: true},
     author: {type: String, required: true},
     price: {type: Number, requited: true},
-    numberOfUnits: {type: Number, required: true},
+    numberOfUnits: {type: Number, default: 1},
     isAvailable: {type: Boolean, default: true},
     isActive: {type: Boolean, default: true}
 },{

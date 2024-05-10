@@ -52,26 +52,31 @@ async function updateBook(token, data) {
         throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay libro 🙊" }))
     }
 
-    const { _id, ...changes } = data
+    const { _id, owner, ...changes } = data
 
     var books
-    try {
 
-        books = await getBooksMongo({ owner: decodedToken.username, _id: _id })
-        console.log(books)
-
-        if (books.length===0) {
-            throw new Error(JSON.stringify({ code: 401, msg: "Usted no tiene un libro con esas características" }))
-        }
-
-        
-        const response = await updateBookMongo({_id: _id}, changes)
-
-        return response
-
-    } catch (error) {
-        throw new Error(JSON.stringify({ code: 401, msg: "Error al actualizar la información 😯" }))
+    books = await getBooksMongo({ owner: decodedToken.username, _id: _id })
+        //console.log(books)
+    
+    if (books.length===0) {
+        throw new Error(JSON.stringify({ code: 401, msg: "Usted no tiene un libro con esas características" }))
     }
+   
+    if (!owner){
+    
+        try {   
+            const response = await updateBookMongo({_id: _id}, changes)
+    
+            return response
+    
+        } catch (error) {
+            throw new Error(JSON.stringify({ code: 401, msg: "Error al actualizar la información 😯" }))
+        }
+    } 
+    throw new Error(JSON.stringify({ code: 401, msg: "Usted no puede modificar esa información 😐"}))
+
+   
 }
 
 async function deleteBook(token, id) {

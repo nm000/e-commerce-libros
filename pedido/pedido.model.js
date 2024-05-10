@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const schemaPedido = new mongoose.Schema({
-    buyer: {type: String, required: true}, //ID number for person who makes the order
+    buyer: {type: String, required: true}, // username for person who makes the order.
     buyerPhone: {type: String, required: true},
-    seller: {type: String, required: true},
+    seller: {type: String, required: true}, // username for person who is owner of the books.
     status: {type: String, required: true},
     book: {type: [String], required: true},
     dropOffAddress: {type: String, required:true},

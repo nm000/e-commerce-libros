@@ -39,18 +39,18 @@ async function patchOrder(req, res){
     try{
         const response = await updateOrder(req.headers['authorization'], req.body)
         res.status(200).json({
-            mensaje: "Estado de pedido actualizado !!"
+            mensaje: "ESTADO de pedido actualizado !!"
         })
     } catch(error){
         const err = JSON.parse(error.message)
         res.status(err.code).json({
-            mensaje: "Problemas al actualizar su pedidos 😐",
+            mensaje: "Problemas al actualizar su ESTADO 😐",
             err: err.msg
         })
     }
 }
 
 router.get("/", getForOrders)
-router.post("/nuevoPedido", postOrder)
+router.post("/", postOrder)
 router.patch("/", patchOrder)
 module.exports = router;

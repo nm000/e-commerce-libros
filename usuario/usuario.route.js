@@ -5,8 +5,7 @@ const { getUsers,
     createUser,
     updateUser,
     login,
-    deleteUser,
-    verifyTokenLogin } = require("./usuario.controller");
+    deleteUser } = require("./usuario.controller");
 
 async function getForUsers(req, res) {
     try {
@@ -51,6 +50,21 @@ async function patchUser(req, res) {
     }
 }
 
+async function deleteForUser(req, res){
+    try {
+        await deleteUser(req.headers['authorization'],req.body)
+        res.status(200).json({
+            mensaje: "Usuario eliminado 🙂"
+        })
+    } catch(error){
+        const err = JSON.parse(error.message)
+        res.status(err.code).json({
+            mensaje: "Falló al borrar su información 😞",
+            err: err.msg
+        })
+    }
+}
+
 async function postLogin(req, res) {
     try {
         await login(req.body)
@@ -68,7 +82,8 @@ async function postLogin(req, res) {
 
 router.get("/", getForUsers)
 router.post("/login", postLogin)
-router.post("/nuevoUsuario", postUser)
-router.patch("/actualizarUsuario", patchUser)
+router.post("/", postUser)
+router.patch("/", patchUser)
+router.delete("/", deleteForUser)
 
 module.exports = router;

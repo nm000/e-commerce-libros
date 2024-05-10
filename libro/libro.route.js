@@ -66,7 +66,7 @@ async function deleteForBook(req, res){
 }
 
 router.get("/", getForBooks)
-router.post("/nuevoLibro", postBook)
-router.patch("/actualizarLibro", patchBook)
-router.delete("/borrarLibro", deleteForBook)
+router.post("/", postBook)
+router.patch("/", patchBook)
+router.delete("/", deleteForBook)
 module.exports = router;

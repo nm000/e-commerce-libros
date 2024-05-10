@@ -1,17 +1,17 @@
 const jwt = require('jsonwebtoken');
-secretKey = "secretOrPrivateKey must have a value"
-
+require('dotenv').config()
 
 function generateToken(user) {
     id = user[0]._id.toString()
-    return jwt.sign({ id: id, username: user[0].username }, secretKey);
+    //Information that we're going to save in JWT is _id and username.
+    return jwt.sign({ id: id, username: user[0].username }, process.env.SECRET);
 }
 
 function verifyToken(token) {
     if (token && token.startsWith('Bearer ')){
         const tokenJWT = token.slice(7)
         try {
-            return jwt.verify(tokenJWT, secretKey)
+            return jwt.verify(tokenJWT, process.env.SECRET)
         } catch (error){
             throw new Error (JSON.stringify({code: 401, msg: 'Token inválido' }))
         }

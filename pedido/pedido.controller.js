@@ -174,6 +174,10 @@ async function createOrder(token, data) {
         const _id = data.book
         book = await getBooksMongo({ _id: _id })
 
+        if (book.length === 0){
+            throw new Error(JSON.stringify({ code: 400, msg: "El libro no existe"}))
+        }
+
         if (!validateBookIsAvailable(book[0], 1)) {
             throw new Error(JSON.stringify({ code: 400, msg: "El libro no está disponible para la compra" }))
         }
@@ -186,6 +190,9 @@ async function createOrder(token, data) {
         let booksData = []
         for (const b of data.book) {
             const book = await getBooksMongo({ _id: b })
+            if (book.length === 0){
+                throw new Error(JSON.stringify({ code: 400, msg: "El libro no existe"}))
+            }
             booksData.push(book)
         }
 
@@ -202,6 +209,7 @@ async function createOrder(token, data) {
             if (!ownerBooksId.includes(book[0]._id.toString())) {
                 throw new Error(JSON.stringify({ code: 401, msg: "Los libros no pertenecen al mismo autor." }));
             }
+
 
             //console.log(book[0], booksQuantity[book[0]._id.toString()])
             if (!validateBookIsAvailable(book[0], booksQuantity[book[0]._id.toString()])) {

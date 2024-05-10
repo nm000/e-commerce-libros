@@ -13,8 +13,12 @@ async function getForUsers(req, res) {
         res.status(200).json({
             ...usuarios
         })
-    } catch (e) {
-        res.status(500).json({ msg: "Problemas para encontrar los usuarios 😶" })
+    } catch (error) {
+        const err = JSON.parse(error.message);
+        res.status(err.code).json({
+            mensaje: "Problemas para encontrar los usuarios 😶",
+            err: err.msg
+        })
     }
 }
 
@@ -37,7 +41,7 @@ async function postUser(req, res) {
 
 async function patchUser(req, res) {
     try {
-        await updateUser(req.headers['authorization'],req.body)
+        await updateUser(req.headers['authorization'], req.body)
         res.status(200).json({
             mensaje: "Usuario actualizado 🙂"
         })
@@ -50,13 +54,13 @@ async function patchUser(req, res) {
     }
 }
 
-async function deleteForUser(req, res){
+async function deleteForUser(req, res) {
     try {
-        await deleteUser(req.headers['authorization'],req.body)
+        await deleteUser(req.headers['authorization'], req.body)
         res.status(200).json({
             mensaje: "Usuario eliminado 🙂"
         })
-    } catch(error){
+    } catch (error) {
         const err = JSON.parse(error.message)
         res.status(err.code).json({
             mensaje: "Falló al borrar su información 😞",

@@ -10,12 +10,21 @@ const CryptoJS = require("crypto-js")
 
 async function getUsers(query) {
 
-    const users = await getUsersMongo(query)
-    if (!query.isActive) {
-        const activeUsers = users.filter((u) => u.isActive)
-        return activeUsers
+    const {password, ...info} = query
+
+    if (!password){
+        const users = await getUsersMongo(query)
+        if (users.length === 0){
+            throw new Error(JSON.stringify({code: 401, msg: "No hay un usuario con esa información"}))
+        }
+        if (!query.isActive) { // Check if user is active to show up
+            const activeUsers = users.filter((u) => u.isActive)
+            return activeUsers
+        }
+        return users
     }
-    return users
+
+    throw new Error(JSON.stringify({code: 400, msg: "No es posible filtrar su contraseña!!"}))
 }
 
 
@@ -40,7 +49,13 @@ async function updateUser(token, data) {
         throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay modificacion 🙊" }))
     }
 
-    const user = await updateUserMongo(decodedToken.username, data)
+    var user 
+
+    if (!(data.password===undefined)){
+        data.password = CryptoJS.MD5(data.password).toString()
+    }
+
+    user = await updateUserMongo(decodedToken.username, data)
     return user
 
 }

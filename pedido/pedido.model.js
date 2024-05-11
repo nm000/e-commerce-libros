@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose")
 
 const schemaPedido = new mongoose.Schema({
     buyer: {type: String, required: true}, // username for person who makes the order.
@@ -17,6 +17,6 @@ const schemaPedido = new mongoose.Schema({
 })
 
 
-const Model = mongoose.model('Pedido', schemaPedido);
+const Model = mongoose.model('Pedido', schemaPedido)
 
-module.exports = Model;
+module.exports = Model

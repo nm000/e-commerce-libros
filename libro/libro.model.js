@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose")
 
 const schemaLibro = new mongoose.Schema({
     name: {type: String, required: true},
@@ -16,6 +16,5 @@ const schemaLibro = new mongoose.Schema({
     versionKey: false
 })
 
-const Model = mongoose.model('Libro', schemaLibro);
-
-module.exports = Model;
+const Model = mongoose.model('Libro', schemaLibro)
+module.exports = Model6

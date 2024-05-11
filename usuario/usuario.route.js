@@ -1,10 +1,10 @@
 const express = require('express')
-const router = express.Router();
+const router = express.Router()
 const { getUsers,
     createUser,
     updateUser,
     login,
-    deleteUser } = require("./usuario.controller");
+    deleteUser } = require("./usuario.controller")
 
 async function getForUsers(req, res) {
     try {
@@ -13,7 +13,7 @@ async function getForUsers(req, res) {
             ...usuarios
         })
     } catch (error) {
-        const err = JSON.parse(error.message);
+        const err = JSON.parse(error.message)
         res.status(err.code).json({
             mensaje: "Problemas para encontrar los usuarios 😶",
             err: err.msg
@@ -30,7 +30,7 @@ async function postUser(req, res) {
             usuario: user
         })
     } catch (error) {
-        const err = JSON.parse(error.message);
+        const err = JSON.parse(error.message)
         res.status(err.code).json({
             mensaje: "Falló al crear el usuario",
             err: err.msg
@@ -77,7 +77,7 @@ async function postLogin(req, res) {
             token: token
         })
     } catch (error) {
-        const err = JSON.parse(error.message);
+        const err = JSON.parse(error.message)
         res.status(err.code).json({
             mensaje: "Falló en iniciar sesión 😢",
             err: err.msg
@@ -91,4 +91,4 @@ router.post("/", postUser)
 router.patch("/", patchUser)
 router.delete("/", deleteForUser)
 
-module.exports = router;
+module.exports = router

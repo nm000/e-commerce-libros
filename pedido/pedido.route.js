@@ -1,5 +1,5 @@
 const express = require('express')
-const router = express.Router();
+const router = express.Router()
 const {createOrder,
     getOrders,
     updateOrder,
@@ -71,4 +71,4 @@ router.get("/", getForOrders)
 router.post("/", postOrder)
 router.patch("/", patchOrder)
 router.delete("/", deleteForOrder)
-module.exports = router;
+module.exports = router

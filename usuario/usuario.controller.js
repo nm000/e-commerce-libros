@@ -4,7 +4,7 @@ const { getUsersMongo,
     deleteUserMongo,
 } = require("./usuario.actions")
 const { getBooksMongo, updateBookMongo } = require("../libro/libro.actions")
-const { generateToken, verifyToken } = require('../utils/auth');
+const { generateToken, verifyToken } = require('../utils/auth')
 const CryptoJS = require("crypto-js")
 
 async function getUsers(token, query) {
@@ -35,7 +35,7 @@ async function createUser(data) {
     if ((await getUsersMongo({ username })).length === 0) {
         data.password = CryptoJS.MD5(data.password).toString()
 
-        const user = await createUserMongo(data);
+        const user = await createUserMongo(data)
 
         return user
     }
@@ -89,7 +89,7 @@ async function deleteUser(token, data) {
 
 async function login(datos) {
 
-    const { username, password } = datos;
+    const { username, password } = datos
 
     const hashPassword = CryptoJS.MD5(password).toString()
     

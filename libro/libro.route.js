@@ -28,7 +28,7 @@ async function postBook(req, res){
             libro: book
         })
     } catch(error){
-        const err = JSON.parse(error.message);
+        const err = JSON.parse(error.message)
         res.status(err.code).json({
             mensaje: "Falló al crearse el libro 📒",
             err: err.msg
@@ -70,4 +70,5 @@ router.get("/", getForBooks)
 router.post("/", postBook)
 router.patch("/", patchBook)
 router.delete("/", deleteForBook)
-module.exports = router;
+
+module.exports = router

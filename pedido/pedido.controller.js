@@ -4,8 +4,8 @@ const { createOrderMongo,
     deleteOrderMongo
 } = require("./pedido.actions")
 const { getBooksMongo, updateBookMongo } = require("../libro/libro.actions")
-const { verifyToken } = require('../utils/auth');
-const { getUsersMongo, updateUserMongo } = require("../usuario/usuario.actions");
+const { verifyToken } = require('../utils/auth')
+const { getUsersMongo, updateUserMongo } = require("../usuario/usuario.actions")
 
 
 async function getOrders(token, query) {
@@ -71,42 +71,42 @@ async function updateOrder(token, data) {
     if (Object.keys(other).length > 0 || !status) {
         throw new Error(JSON.stringify({ code: 403, msg: "Usted solo puede cambiar el estado del pedido!!" }))
     } else {
-        const order = await getOrdersMongo({ _id: _id, isActive: true });
+        const order = await getOrdersMongo({ _id: _id, isActive: true })
 
         if (order.length === 0) {
-            throw new Error(JSON.stringify({ code: 404, msg: "No hay información de ese pedido" }));
+            throw new Error(JSON.stringify({ code: 404, msg: "No hay información de ese pedido" }))
         }
 
-        const orderData = order[0];
+        const orderData = order[0]
 
         if (orderData.status !== "En progreso") {
-            throw new Error(JSON.stringify({ code: 403, msg: "No es posible acceder a ese pedido" }));
+            throw new Error(JSON.stringify({ code: 403, msg: "No es posible acceder a ese pedido" }))
         }
 
         if (decodedToken.username !== orderData.buyer && decodedToken.username !== orderData.seller) {
-            throw new Error(JSON.stringify({ code: 404, msg: "Usted no tiene ese pedido en su lista, rectifique!!" }));
+            throw new Error(JSON.stringify({ code: 404, msg: "Usted no tiene ese pedido en su lista, rectifique!!" }))
         }
 
         if (decodedToken.username === orderData.buyer) {
             if (status !== "Cancelado") {
-                throw new Error(JSON.stringify({ code: 403, msg: "Usted no puede cambiar el estado de este pedido" }));
+                throw new Error(JSON.stringify({ code: 403, msg: "Usted no puede cambiar el estado de este pedido" }))
             }
-            return await updateOrderMongo({ _id: _id }, { status: "Cancelado", isCancelled: true });
+            return await updateOrderMongo({ _id: _id }, { status: "Cancelado", isCancelled: true })
         }
 
         if (decodedToken.username === orderData.seller) {
             if (status !== "Cancelado" && status !== "Completado") {
-                throw new Error(JSON.stringify({ code: 403, msg: "Usted no puede cambiar el estado de este pedido" }));
+                throw new Error(JSON.stringify({ code: 403, msg: "Usted no puede cambiar el estado de este pedido" }))
             }
 
             if (status === "Cancelado") {
-                return await updateOrderMongo({ _id: _id }, { status: status, isCancelled: true });
+                return await updateOrderMongo({ _id: _id }, { status: status, isCancelled: true })
             }
 
-            const response = await updateOrderMongo({ _id: _id }, { status: status, isCompleted: true });
-            await updateStatusBooks(_id);
-            await updateUserBooks(decodedToken.username);
-            return response;
+            const response = await updateOrderMongo({ _id: _id }, { status: status, isCompleted: true })
+            await updateStatusBooks(_id)
+            await updateUserBooks(decodedToken.username)
+            return response
         }
     }
 
@@ -174,7 +174,7 @@ async function createOrder(token, data) {
         for (const book of booksData) {
 
             if (book[0].owner === decodedToken.username) {
-                throw new Error(JSON.stringify({ code: 400, msg: "No puedes comprar tus propios libros." }));
+                throw new Error(JSON.stringify({ code: 400, msg: "No puedes comprar tus propios libros." }))
             }
 
             const ownerBooks = await getBooksMongo({ owner: booksData[0][0].owner, isActive: true })
@@ -185,13 +185,13 @@ async function createOrder(token, data) {
             const ownerBooksId = ownerBooks.map(b => b._id.toString())
 
             if (!ownerBooksId.includes(book[0]._id.toString())) {
-                throw new Error(JSON.stringify({ code: 400, msg: "Los libros no pertenecen al mismo autor." }));
+                throw new Error(JSON.stringify({ code: 400, msg: "Los libros no pertenecen al mismo autor." }))
             }
 
 
             //console.log(book[0], booksQuantity[book[0]._id.toString()])
             if (!validateBookIsAvailable(book[0], booksQuantity[book[0]._id.toString()])) {
-                throw new Error(JSON.stringify({ code: 409, msg: "El libro no está disponible para la compra o está solicitando más unidades de las disponibles" }));
+                throw new Error(JSON.stringify({ code: 409, msg: "El libro no está disponible para la compra o está solicitando más unidades de las disponibles" }))
             }
         
 

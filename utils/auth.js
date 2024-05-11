@@ -1,10 +1,10 @@
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
 function generateToken(user) {
     id = user[0]._id.toString()
     //Information that we're going to save in JWT is _id and username.
-    return jwt.sign({ id: id, username: user[0].username }, process.env.SECRET);
+    return jwt.sign({ id: id, username: user[0].username }, process.env.SECRET)
 }
 
 function verifyToken(token) {
@@ -22,4 +22,4 @@ function verifyToken(token) {
 
 }
 
-module.exports = { generateToken, verifyToken };
+module.exports = { generateToken, verifyToken }

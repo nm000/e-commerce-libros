@@ -13,6 +13,6 @@ const schemaUsuario = new mongoose.Schema({
     timestamps: true
 })
 
-const Model = mongoose.model('Usuario', schemaUsuario);
+const Model = mongoose.model('Usuario', schemaUsuario)
 
-module.exports = Model;
+module.exports = Model

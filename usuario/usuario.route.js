@@ -8,7 +8,7 @@ const { getUsers,
 
 async function getForUsers(req, res) {
     try {
-        const usuarios = await getUsers(req.query)
+        const usuarios = await getUsers(req.headers['authorization'], req.query)
         res.status(200).json({
             ...usuarios
         })

@@ -8,16 +8,18 @@ function generateToken(user) {
 }
 
 function verifyToken(token) {
-    if (token && token.startsWith('Bearer ')){
-        const tokenJWT = token.slice(7)
-        try {
-            return jwt.verify(tokenJWT, process.env.SECRET)
-        } catch (error){
-            throw new Error (JSON.stringify({code: 401, msg: 'Token inválido' }))
-        }
-    } else {
-        throw new Error (JSON.stringify({code: 401, msg: 'Token no proporcionado' }))
+    if (!token) { // person did not attach the auth
+        throw new Error(JSON.stringify({ code: 401, msg: 'No tenemos cómo validar su identidad, pruebe de nuevo 😭' }))
     }
+
+
+    const tokenJWT = token.slice(7) // becasue token has the string Bearer and we need to remove it.
+    try {
+        return jwt.verify(tokenJWT, process.env.SECRET)
+    } catch (error) {
+        throw new Error(JSON.stringify({ code: 401, msg: 'Token inválido' }))
+    }
+
 }
 
 module.exports = { generateToken, verifyToken };

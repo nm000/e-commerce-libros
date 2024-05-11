@@ -12,10 +12,6 @@ async function getOrders(token, query) {
 
     const decodedToken = verifyToken(token)
 
-    if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay pedido 🙊" }))
-    }
-
     var orders
 
     if (!query.startDate && !query.endDate) { //Filter between two dates.
@@ -31,13 +27,13 @@ async function getOrders(token, query) {
     }
 
     var myOrders = orders.filter((order) => order.buyer === decodedToken.username || order.seller === decodedToken.username)
-    console.log(myOrders)
+    
     if (myOrders.length === 0) {
         throw new Error(JSON.stringify({ code: 404, msg: "No hay ordenes a su nombre o con esas características" }))
     }
 
 
-    if (!query.status && !query.isCompleted && !query.isCancelled) {
+    if (!query.isCancelled && !query.isActive) {
         //If user does not try to get an order that was already completed or deleted, we will filter the information
         return myOrders.filter((order) => (!order.isCancelled && order.isActive))
     } else {
@@ -50,9 +46,10 @@ async function getOrders(token, query) {
 
 async function updateStatusBooks(orderId) {
     const order = await getOrdersMongo({ _id: orderId })
+
     const books = order[0].book
     for (let book in books) {
-        await updateBookMongo({ _id: books[book] }, { isActive: false, isAvailable: false, numberOfUnits: 0 })
+        return await updateBookMongo({ _id: books[book] }, { isActive: false, isAvailable: false, numberOfUnits: 0 })
     }
 }
 
@@ -61,16 +58,12 @@ async function updateUserBooks(username) {
     var activeBooks = []
     activeBooks = books.filter((book) => book.isActive).map((book) => book._id.toString())
     //console.log(activeBooks)
-    await updateUserMongo(username, { book: activeBooks })
+    return await updateUserMongo(username, { book: activeBooks })
 }
 
 async function updateOrder(token, data) {
 
     const decodedToken = verifyToken(token)
-
-    if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay pedido 🙊" }))
-    }
 
     const { _id, status, ...other } = data
 
@@ -78,7 +71,7 @@ async function updateOrder(token, data) {
     if (Object.keys(other).length > 0 || !status) {
         throw new Error(JSON.stringify({ code: 403, msg: "Usted solo puede cambiar el estado del pedido!!" }))
     } else {
-        const order = await getOrdersMongo({ _id: _id });
+        const order = await getOrdersMongo({ _id: _id, isActive: true });
 
         if (order.length === 0) {
             throw new Error(JSON.stringify({ code: 404, msg: "No hay información de ese pedido" }));
@@ -163,49 +156,33 @@ async function createOrder(token, data) {
 
     const decodedToken = verifyToken(token) // verify the auth header
 
-    if (!decodedToken) { // person did not attach the auth
-        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay pedido 🙊" }))
-    }
-
-    var owner, book, totalPayment
+    var owner, totalPayment
     var booksQuantity = getCountOfBooks(data.book) // To know how many units of each book will buy the person
-
-    if (data.book.length === 1) { // It means that user just request one book
-        
-        const _id = data.book
-        book = await getBooksMongo({ _id: _id })
-
-        if (book.length === 0){
-            throw new Error(JSON.stringify({ code: 400, msg: "El libro no existe"}))
-        }
-
-        if (!validateBookIsAvailable(book[0], 1)) {
-            throw new Error(JSON.stringify({ code: 400, msg: "El libro no está disponible para la compra" }))
-        }
-
-        totalPayment = book[0].price
-        owner = book[0].owner
-
-    } else {
 
         let booksData = []
         for (const b of data.book) {
-            const book = await getBooksMongo({ _id: b })
+            const book = await getBooksMongo({ _id: b, isActive: true})
             if (book.length === 0){
-                throw new Error(JSON.stringify({ code: 404, msg: "El libro no existe"}))
+                throw new Error(JSON.stringify({ code: 404, msg: `El libro ${b} no existe`}))
             }
             booksData.push(book)
         }
 
         //console.log(booksData)
-        const ownerBooks = await getBooksMongo({ owner: booksData[0][0].owner })
-        const ownerBooksId = ownerBooks.map(b => b._id.toString())
+        
 
         for (const book of booksData) {
 
             if (book[0].owner === decodedToken.username) {
                 throw new Error(JSON.stringify({ code: 400, msg: "No puedes comprar tus propios libros." }));
             }
+
+            const ownerBooks = await getBooksMongo({ owner: booksData[0][0].owner, isActive: true })
+
+            if (ownerBooks.length === 0){
+                throw new Error(JSON.stringify({ code: 400, msg: "El autor no tiene libros disponibles."}))
+            }
+            const ownerBooksId = ownerBooks.map(b => b._id.toString())
 
             if (!ownerBooksId.includes(book[0]._id.toString())) {
                 throw new Error(JSON.stringify({ code: 400, msg: "Los libros no pertenecen al mismo autor." }));
@@ -216,7 +193,7 @@ async function createOrder(token, data) {
             if (!validateBookIsAvailable(book[0], booksQuantity[book[0]._id.toString()])) {
                 throw new Error(JSON.stringify({ code: 409, msg: "El libro no está disponible para la compra o está solicitando más unidades de las disponibles" }));
             }
-        }
+        
 
         owner = booksData[0][0].owner
         totalPayment = await getTotalPayment(data.book)
@@ -236,7 +213,7 @@ async function createOrder(token, data) {
         const response = await createOrderMongo(newOrder)
         return response
     } catch (error) {
-        throw new Error(JSON.stringify({ code: 500, msg: "Error al crear su pedido, intente más tarde!", err: error }))
+        throw new Error(JSON.stringify({ code: 500, msg: "Error al crear su pedido, intente más tarde!"}))
     }
 
 }
@@ -244,15 +221,11 @@ async function createOrder(token, data) {
 async function deleteOrder(token, data){
     const decodedToken = verifyToken(token) // verify the auth header
 
-    if (!decodedToken) { // person did not attach the auth
-        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay pedido 🙊" }))
-    }
-
     const orderId = data._id    
     const order = await getOrdersMongo({_id: orderId, buyer: decodedToken.username, isActive: true})
 
     if(order.length === 0){
-        throw new Error(JSON.stringify({ code: 404, msg: "Usted no tiene ordenes para borrar"}))
+        throw new Error(JSON.stringify({ code: 404, msg: "Usted no ha creado una orden para borrar"}))
     }
 
     try{

@@ -1,14 +1,15 @@
 const { getUsersMongo,
     createUserMongo,
     updateUserMongo,
-    updateBooksUserMongo,
     deleteUserMongo,
 } = require("./usuario.actions")
 const { getBooksMongo, updateBookMongo } = require("../libro/libro.actions")
 const { generateToken, verifyToken } = require('../utils/auth');
 const CryptoJS = require("crypto-js")
 
-async function getUsers(query) {
+async function getUsers(token, query) {
+
+    const decodedToken = verifyToken(token)
 
     const {password, ...info} = query
 
@@ -45,12 +46,7 @@ async function updateUser(token, data) {
 
     const decodedToken = verifyToken(token)
 
-    if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay modificacion 🙊" }))
-    }
-
-
-    if(!(data.username === undefined)){
+    if(!(data.username === undefined)){ // username is immutable in the model, however the user have to know that he is not able to change this information.
         throw new Error(JSON.stringify({ code: 403, msg: "No es posible cambiar su usuario!"}))
     }
 
@@ -81,10 +77,6 @@ async function deleteUser(token, data) {
 
     const decodedToken = verifyToken(token)
 
-    if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 401, msg: "Sin credeciales no se borra " }))
-    }
-
     try {
         const user = await deleteUserMongo(decodedToken.id)
         await updateStatusBooks(decodedToken.username)
@@ -101,7 +93,7 @@ async function login(datos) {
 
     const hashPassword = CryptoJS.MD5(password).toString()
     
-    const usuario = await getUsers({ username })
+    const usuario = await getUsersMongo({ username })
     if (!usuario[0] || usuario[0].password !== hashPassword) {
         throw new Error(JSON.stringify({ code: 401, msg: "Credenciales incorrectas 😑" }))
     }

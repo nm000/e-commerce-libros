@@ -18,11 +18,6 @@ async function getBooks(query) {
 async function createBook(token, data) {
 
     const decodedToken = verifyToken(token)
-    console.log(decodedToken)
-
-    if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay libro 🙊" }))
-    }
 
     const { ...book } = data
 
@@ -48,15 +43,9 @@ async function updateBook(token, data) {
 
     const decodedToken = verifyToken(token)
 
-    if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay libro 🙊" }))
-    }
-
     const { _id, owner, ...changes } = data
 
-    var books
-
-    books = await getBooksMongo({ owner: decodedToken.username, _id: _id })
+    var books  = await getBooksMongo({ owner: decodedToken.username, _id: _id, isActive: true })
         //console.log(books)
     
     if (books.length===0) {
@@ -82,11 +71,8 @@ async function updateBook(token, data) {
 async function deleteBook(token, id) {
     const decodedToken = verifyToken(token)
 
-    if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay pedido 🙊" }))
-    }
-    const book = await getBooksMongo({ _id: id })
-    console.log(book)
+    const book = await getBooksMongo({ _id: id, isActive: true })
+    
     if (book[0].owner === decodedToken.username) {
         try {
             return await deleteBookMongo(id)

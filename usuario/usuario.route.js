@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router();
 const { getUsers,
-    getUser,
     createUser,
     updateUser,
     login,
@@ -25,9 +24,10 @@ async function getForUsers(req, res) {
 
 async function postUser(req, res) {
     try {
-        await createUser(req.body)
+        const user = await createUser(req.body)
         res.status(200).json({
-            mensaje: "Nuevo usuario 😎"
+            mensaje: "Nuevo usuario 😎",
+            usuario: user
         })
     } catch (error) {
         const err = JSON.parse(error.message);
@@ -71,9 +71,10 @@ async function deleteForUser(req, res) {
 
 async function postLogin(req, res) {
     try {
-        await login(req.body)
+        const token = await login(req.body)
         res.status(200).json({
-            mensaje: "Inicio éxitoso 🥳"
+            mensaje: "Inicio éxitoso 🥳",
+            token: token
         })
     } catch (error) {
         const err = JSON.parse(error.message);

@@ -1,6 +1,7 @@
 const { createOrderMongo,
     getOrdersMongo,
-    updateOrderMongo
+    updateOrderMongo,
+    deleteOrderMongo
 } = require("./pedido.actions")
 const { getBooksMongo, updateBookMongo } = require("../libro/libro.actions")
 const { verifyToken } = require('../utils/auth');
@@ -38,7 +39,7 @@ async function getOrders(token, query) {
 
     if (!query.status && !query.isCompleted && !query.isCancelled) {
         //If user does not try to get an order that was already completed or deleted, we will filter the information
-        return myOrders.filter((order) => (!order.isCancelled && !order.isCompleted))
+        return myOrders.filter((order) => (!order.isCancelled && order.isActive))
     } else {
         //If user wants to know for a "cancel" or completed order, we will give him the information.
         return myOrders
@@ -240,9 +241,33 @@ async function createOrder(token, data) {
 
 }
 
+async function deleteOrder(token, data){
+    const decodedToken = verifyToken(token) // verify the auth header
+
+    if (!decodedToken) { // person did not attach the auth
+        throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay pedido 🙊" }))
+    }
+
+    const orderId = data._id    
+    const order = await getOrdersMongo({_id: orderId, buyer: decodedToken.username, isActive: true})
+
+    if(order.length === 0){
+        throw new Error(JSON.stringify({ code: 401, msg: "Usted no tiene ordenes para borrar"}))
+    }
+
+    try{
+        const response = await deleteOrderMongo({_id: orderId}, {isActive: false})
+        return response
+    } catch(error){
+        throw new Error(JSON.stringify({code: 401, msg: "Error al borrar su orden, intente luego!"}))
+    }
+
+}
+
 
 module.exports = {
     createOrder,
     getOrders,
-    updateOrder
+    updateOrder,
+    deleteOrder
 }

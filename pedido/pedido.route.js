@@ -3,6 +3,7 @@ const router = express.Router();
 const {createOrder,
     getOrders,
     updateOrder,
+    deleteOrder
 } = require('./pedido.controller')
 
 async function postOrder(req, res){
@@ -50,7 +51,23 @@ async function patchOrder(req, res){
     }
 }
 
+async function deleteForOrder(req, res){
+    try{
+        const response = await deleteOrder(req.headers['authorization'], req.body)
+        res.status(200).json({
+            mensaje: "Pedido borrado !!"
+        })
+    } catch(error){
+        const err = JSON.parse(error.message)
+        res.status(err.code).json({
+            mensaje: "Problemas al borrar su pedido 😐",
+            err: err.msg
+        })
+    }
+}
+
 router.get("/", getForOrders)
 router.post("/", postOrder)
 router.patch("/", patchOrder)
+router.delete("/", deleteForOrder)
 module.exports = router;

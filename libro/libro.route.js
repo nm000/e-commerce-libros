@@ -22,9 +22,10 @@ async function getForBooks(req, res){
 
 async function postBook(req, res){
     try{
-        await createBook(req.headers['authorization'],req.body)
+        const book = await createBook(req.headers['authorization'],req.body)
         res.status(200).json({
-            mensaje: "Libro creado 😎"
+            mensaje: "Libro creado 😎",
+            libro: book
         })
     } catch(error){
         const err = JSON.parse(error.message);

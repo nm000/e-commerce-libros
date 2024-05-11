@@ -15,7 +15,7 @@ async function updateOrderMongo(_id,data){
     return order
 }
 
-async function deleteOrderMongo(_id,data){ // CHECK IF WE WILL USE A DELETE FOR ORDERS
+async function deleteOrderMongo(_id,data){
     const order = await Pedido.findOneAndUpdate(_id,data)
     return order
 }

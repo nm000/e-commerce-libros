@@ -10,6 +10,7 @@ const schemaPedido = new mongoose.Schema({
     total: {type: Number, required:true},
     isCancelled: {type: Boolean, default: false},
     isCompleted: {type: Boolean, default: false},
+    isActive: {type: Boolean, default: true}
 }, {
     versionKey: false,
     timestamps: true

@@ -31,7 +31,7 @@ async function getUsers(query) {
 async function createUser(data) {
     const { username, password, fullName, phoneNumber, alias } = data
 
-    if ((await getUsers({ username })).length === 0) {
+    if ((await getUsersMongo({ username })).length === 0) {
         data.password = CryptoJS.MD5(data.password).toString()
 
         const user = await createUserMongo(data);
@@ -49,14 +49,22 @@ async function updateUser(token, data) {
         throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay modificacion 🙊" }))
     }
 
-    var user 
+
+    if(!(data.username === undefined)){
+        throw new Error(JSON.stringify({ code: 400, msg: "No es posible cambiar su usuario!"}))
+    }
 
     if (!(data.password===undefined)){
         data.password = CryptoJS.MD5(data.password).toString()
     }
 
-    user = await updateUserMongo(decodedToken.username, data)
-    return user
+    try{
+        const user = await updateUserMongo(decodedToken.username, data)
+        return user
+    } catch(error){
+        throw new Error(JSON.stringify({code: 400, msg:"Tuvimos problemas al actualizar su información"}))
+    }
+    
 
 }
 

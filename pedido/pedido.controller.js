@@ -13,7 +13,7 @@ async function getOrders(token, query) {
     const decodedToken = verifyToken(token)
 
     if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay pedido 🙊" }))
+        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay pedido 🙊" }))
     }
 
     var orders
@@ -33,7 +33,7 @@ async function getOrders(token, query) {
     var myOrders = orders.filter((order) => order.buyer === decodedToken.username || order.seller === decodedToken.username)
     console.log(myOrders)
     if (myOrders.length === 0) {
-        throw new Error(JSON.stringify({ code: 400, msg: "No hay ordenes a su nombre o con esas características" }))
+        throw new Error(JSON.stringify({ code: 404, msg: "No hay ordenes a su nombre o con esas características" }))
     }
 
 
@@ -69,41 +69,41 @@ async function updateOrder(token, data) {
     const decodedToken = verifyToken(token)
 
     if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay pedido 🙊" }))
+        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay pedido 🙊" }))
     }
 
     const { _id, status, ...other } = data
 
 
     if (Object.keys(other).length > 0 || !status) {
-        throw new Error(JSON.stringify({ code: 401, msg: "Usted solo puede cambiar el estado del pedido!!" }))
+        throw new Error(JSON.stringify({ code: 403, msg: "Usted solo puede cambiar el estado del pedido!!" }))
     } else {
         const order = await getOrdersMongo({ _id: _id });
 
         if (order.length === 0) {
-            throw new Error(JSON.stringify({ code: 401, msg: "No es posible acceder a ese pedido" }));
+            throw new Error(JSON.stringify({ code: 404, msg: "No hay información de ese pedido" }));
         }
 
         const orderData = order[0];
 
         if (orderData.status !== "En progreso") {
-            throw new Error(JSON.stringify({ code: 401, msg: "No es posible acceder a ese pedido" }));
+            throw new Error(JSON.stringify({ code: 403, msg: "No es posible acceder a ese pedido" }));
         }
 
         if (decodedToken.username !== orderData.buyer && decodedToken.username !== orderData.seller) {
-            throw new Error(JSON.stringify({ code: 401, msg: "Usted no tiene ese pedido en su lista, rectifique!!" }));
+            throw new Error(JSON.stringify({ code: 404, msg: "Usted no tiene ese pedido en su lista, rectifique!!" }));
         }
 
         if (decodedToken.username === orderData.buyer) {
             if (status !== "Cancelado") {
-                throw new Error(JSON.stringify({ code: 401, msg: "Usted no puede cambiar el estado de este pedido" }));
+                throw new Error(JSON.stringify({ code: 403, msg: "Usted no puede cambiar el estado de este pedido" }));
             }
             return await updateOrderMongo({ _id: _id }, { status: "Cancelado", isCancelled: true });
         }
 
         if (decodedToken.username === orderData.seller) {
             if (status !== "Cancelado" && status !== "Completado") {
-                throw new Error(JSON.stringify({ code: 401, msg: "Usted no puede cambiar el estado de este pedido" }));
+                throw new Error(JSON.stringify({ code: 403, msg: "Usted no puede cambiar el estado de este pedido" }));
             }
 
             if (status === "Cancelado") {
@@ -130,8 +130,8 @@ async function getTotalPayment(books) {
         }
         return accum
     } catch (error) {
-        console.error(error)
-        throw new Error(JSON.stringify({ code: 400, msg: "Presentamos problemas con su pedido, un momento ... 🙊" }))
+        //console.error(error)
+        throw new Error(JSON.stringify({ code: 500, msg: "Presentamos problemas con su pedido, un momento ... 🙊" }))
     }
 }
 
@@ -164,7 +164,7 @@ async function createOrder(token, data) {
     const decodedToken = verifyToken(token) // verify the auth header
 
     if (!decodedToken) { // person did not attach the auth
-        throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay pedido 🙊" }))
+        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay pedido 🙊" }))
     }
 
     var owner, book, totalPayment
@@ -192,7 +192,7 @@ async function createOrder(token, data) {
         for (const b of data.book) {
             const book = await getBooksMongo({ _id: b })
             if (book.length === 0){
-                throw new Error(JSON.stringify({ code: 400, msg: "El libro no existe"}))
+                throw new Error(JSON.stringify({ code: 404, msg: "El libro no existe"}))
             }
             booksData.push(book)
         }
@@ -204,17 +204,17 @@ async function createOrder(token, data) {
         for (const book of booksData) {
 
             if (book[0].owner === decodedToken.username) {
-                throw new Error(JSON.stringify({ code: 401, msg: "No puedes comprar tus propios libros." }));
+                throw new Error(JSON.stringify({ code: 400, msg: "No puedes comprar tus propios libros." }));
             }
 
             if (!ownerBooksId.includes(book[0]._id.toString())) {
-                throw new Error(JSON.stringify({ code: 401, msg: "Los libros no pertenecen al mismo autor." }));
+                throw new Error(JSON.stringify({ code: 400, msg: "Los libros no pertenecen al mismo autor." }));
             }
 
 
             //console.log(book[0], booksQuantity[book[0]._id.toString()])
             if (!validateBookIsAvailable(book[0], booksQuantity[book[0]._id.toString()])) {
-                throw new Error(JSON.stringify({ code: 400, msg: "El libro no está disponible para la compra o está solicitando más unidades de las disponibles" }));
+                throw new Error(JSON.stringify({ code: 409, msg: "El libro no está disponible para la compra o está solicitando más unidades de las disponibles" }));
             }
         }
 
@@ -236,7 +236,7 @@ async function createOrder(token, data) {
         const response = await createOrderMongo(newOrder)
         return response
     } catch (error) {
-        throw new Error(JSON.stringify({ code: 400, msg: "Error al crear su pedido, intente más tarde!", err: error }))
+        throw new Error(JSON.stringify({ code: 500, msg: "Error al crear su pedido, intente más tarde!", err: error }))
     }
 
 }
@@ -245,21 +245,21 @@ async function deleteOrder(token, data){
     const decodedToken = verifyToken(token) // verify the auth header
 
     if (!decodedToken) { // person did not attach the auth
-        throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay pedido 🙊" }))
+        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay pedido 🙊" }))
     }
 
     const orderId = data._id    
     const order = await getOrdersMongo({_id: orderId, buyer: decodedToken.username, isActive: true})
 
     if(order.length === 0){
-        throw new Error(JSON.stringify({ code: 401, msg: "Usted no tiene ordenes para borrar"}))
+        throw new Error(JSON.stringify({ code: 404, msg: "Usted no tiene ordenes para borrar"}))
     }
 
     try{
         const response = await deleteOrderMongo({_id: orderId}, {isActive: false})
         return response
     } catch(error){
-        throw new Error(JSON.stringify({code: 401, msg: "Error al borrar su orden, intente luego!"}))
+        throw new Error(JSON.stringify({code: 500, msg: "Error al borrar su orden, intente luego!"}))
     }
 
 }

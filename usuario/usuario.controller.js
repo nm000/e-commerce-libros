@@ -15,7 +15,7 @@ async function getUsers(query) {
     if (!password){
         const users = await getUsersMongo(query)
         if (users.length === 0){
-            throw new Error(JSON.stringify({code: 401, msg: "No hay un usuario con esa información"}))
+            throw new Error(JSON.stringify({code: 404, msg: "No hay un usuario con esa información"}))
         }
         if (!query.isActive) { // Check if user is active to show up
             const activeUsers = users.filter((u) => u.isActive)
@@ -24,7 +24,7 @@ async function getUsers(query) {
         return users
     }
 
-    throw new Error(JSON.stringify({code: 400, msg: "No es posible filtrar su contraseña!!"}))
+    throw new Error(JSON.stringify({code: 403, msg: "No es posible filtrar su contraseña!!"}))
 }
 
 
@@ -46,12 +46,12 @@ async function updateUser(token, data) {
     const decodedToken = verifyToken(token)
 
     if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 400, msg: "Sin credenciales no hay modificacion 🙊" }))
+        throw new Error(JSON.stringify({ code: 401, msg: "Sin credenciales no hay modificacion 🙊" }))
     }
 
 
     if(!(data.username === undefined)){
-        throw new Error(JSON.stringify({ code: 400, msg: "No es posible cambiar su usuario!"}))
+        throw new Error(JSON.stringify({ code: 403, msg: "No es posible cambiar su usuario!"}))
     }
 
     if (!(data.password===undefined)){
@@ -62,7 +62,7 @@ async function updateUser(token, data) {
         const user = await updateUserMongo(decodedToken.username, data)
         return user
     } catch(error){
-        throw new Error(JSON.stringify({code: 400, msg:"Tuvimos problemas al actualizar su información"}))
+        throw new Error(JSON.stringify({code: 500, msg:"Tuvimos problemas al actualizar su información"}))
     }
     
 
@@ -82,7 +82,7 @@ async function deleteUser(token, data) {
     const decodedToken = verifyToken(token)
 
     if (!decodedToken) {
-        throw new Error(JSON.stringify({ code: 400, msg: "Sin credeciales no se borra " }))
+        throw new Error(JSON.stringify({ code: 401, msg: "Sin credeciales no se borra " }))
     }
 
     try {
@@ -90,7 +90,7 @@ async function deleteUser(token, data) {
         await updateStatusBooks(decodedToken.username)
         return user
     }catch(error){
-        throw new Error(JSON.stringify({ code: 400, msg: "Error al borrar su cuenta, intente más tarde !!"}))
+        throw new Error(JSON.stringify({ code: 500, msg: "Error al borrar su cuenta, intente más tarde !!"}))
     }
 
 }

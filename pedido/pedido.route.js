@@ -8,9 +8,10 @@ const {createOrder,
 
 async function postOrder(req, res){
     try {
-        await createOrder(req.headers['authorization'],req.body)
+        const order = await createOrder(req.headers['authorization'],req.body)
         res.status(200).json({
-            mensaje: "Pedido creado!"
+            mensaje: "Pedido creado!",
+            pedido: order
         })
     }catch(error){
         const err = JSON.parse(error.message)

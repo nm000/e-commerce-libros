@@ -53,7 +53,7 @@ async function patchBook(req, res){
 
 async function deleteForBook(req, res){
     try{
-        await deleteBook(req.headers['authorization'],req.body)
+        await deleteBook(req.headers['authorization'],req.params.id)
         res.status(200).json({
             mensaje: "Libro eliminado!"
         })
@@ -69,6 +69,6 @@ async function deleteForBook(req, res){
 router.get("/", getForBooks)
 router.post("/", postBook)
 router.patch("/", patchBook)
-router.delete("/", deleteForBook)
+router.delete("/:id", deleteForBook)
 
 module.exports = router

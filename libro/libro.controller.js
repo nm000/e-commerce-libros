@@ -73,6 +73,10 @@ async function deleteBook(token, id) {
 
     const book = await getBooksMongo({ _id: id, isActive: true })
     
+    if(book.length === 0){
+        throw new Error(JSON.stringify({ code: 400, msg: "No hay información de ese libro" }))   
+    }
+
     if (book[0].owner === decodedToken.username) {
         try {
             return await deleteBookMongo(id)

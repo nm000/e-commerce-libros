@@ -54,7 +54,7 @@ async function patchOrder(req, res){
 
 async function deleteForOrder(req, res){
     try{
-        const response = await deleteOrder(req.headers['authorization'], req.body)
+        const response = await deleteOrder(req.headers['authorization'], req.params.id)
         res.status(200).json({
             mensaje: "Pedido borrado !!"
         })
@@ -70,5 +70,5 @@ async function deleteForOrder(req, res){
 router.get("/", getForOrders)
 router.post("/", postOrder)
 router.patch("/", patchOrder)
-router.delete("/", deleteForOrder)
+router.delete("/:id", deleteForOrder)
 module.exports = router

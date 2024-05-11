@@ -218,18 +218,17 @@ async function createOrder(token, data) {
 
 }
 
-async function deleteOrder(token, data){
+async function deleteOrder(token, id){
     const decodedToken = verifyToken(token) // verify the auth header
 
-    const orderId = data._id    
-    const order = await getOrdersMongo({_id: orderId, buyer: decodedToken.username, isActive: true})
+    const order = await getOrdersMongo({_id: id, buyer: decodedToken.username, isActive: true})
 
     if(order.length === 0){
         throw new Error(JSON.stringify({ code: 404, msg: "Usted no ha creado una orden para borrar"}))
     }
 
     try{
-        const response = await deleteOrderMongo({_id: orderId}, {isActive: false})
+        const response = await deleteOrderMongo({_id: id}, {isActive: false})
         return response
     } catch(error){
         throw new Error(JSON.stringify({code: 500, msg: "Error al borrar su orden, intente luego!"}))

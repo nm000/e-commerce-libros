@@ -17,4 +17,4 @@ const schemaLibro = new mongoose.Schema({
 })
 
 const Model = mongoose.model('Libro', schemaLibro)
-module.exports = Model6
+module.exports = Model

@@ -56,7 +56,7 @@ async function patchUser(req, res) {
 
 async function deleteForUser(req, res) {
     try {
-        await deleteUser(req.headers['authorization'], req.body)
+        await deleteUser(req.headers['authorization'])
         res.status(200).json({
             mensaje: "Usuario eliminado 🙂"
         })

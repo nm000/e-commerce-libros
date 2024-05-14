@@ -139,7 +139,7 @@ function getCountOfBooks(books) {
         }
     })
 
-    console.log(booksUnitsRequired)
+    //console.log(booksUnitsRequired)
 
     return booksUnitsRequired
 }

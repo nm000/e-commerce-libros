@@ -67,7 +67,7 @@ async function updateUser(token, data) {
 //When we delete an user, their books will be delete too. This function changes the status of isActive to false.
 async function updateStatusBooks(username){
     const books = await getBooksMongo({ owner:username, isActive:true })
-    console.log(books)
+    //console.log(books)
     if (books.length!==0) {
         for (let book in books) {
             await updateBookMongo({_id:books[book]._id.toString()}, {isActive: false, isDisponible: false, numberOfUnits: 0})
@@ -84,9 +84,9 @@ async function deleteUser(token) {
 
     try {
         const user = await deleteUserMongo(decodedToken.id)
-        console.log(user)
+        //console.log(user)
         const deleteBooks = await updateStatusBooks(decodedToken.username)
-        console.log(deleteBooks)
+        //console.log(deleteBooks)
         return user
     }catch(error){
         throw new Error(JSON.stringify({ code: 500, msg: "Error al borrar su cuenta, intente más tarde !!"}))
@@ -106,7 +106,7 @@ async function login(datos) {
     }
 
     const token = generateToken(usuario)
-    console.log(token)
+    //console.log(token)
 
     return token
 

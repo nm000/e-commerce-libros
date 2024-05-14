@@ -32,7 +32,7 @@ async function createBook(token, data) {
         const response = await updateBooksUserMongo(decodedToken.username, newBook._id.toString())
         return newBook
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         throw new Error(JSON.stringify({ code: 500, msg: "Error al crear su libro 📖" }))
     }
 
